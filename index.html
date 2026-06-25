@@ -202,20 +202,19 @@
             width: auto;
         }
 
-        /* DISEÑO DE LA FACTURA ADAPTABLE (CORREGIDO PARA SCROLL MÓVIL) */
+        /* DISEÑO DE LA FACTURA ADAPTABLE */
         .receipt-container-box {
             background-color: #e0e0e0;
             padding: 10px;
             border-radius: 8px;
-            overflow-x: auto; /* Permite deslizar si el recibo es más grande que la pantalla */
+            overflow-x: auto; 
             margin-top: 15px;
-            text-align: center; /* Quitado flex para evitar cortes al hacer scroll */
+            text-align: center; 
         }
 
         .receipt-preview {
             background-color: #ffffff;
-            width: 420px; 
-            margin: 0 auto; /* Centrar con margen automático */
+            margin: 0 auto; 
             padding: 25px 20px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.15);
             font-family: 'Arial', sans-serif;
@@ -223,7 +222,6 @@
             position: relative;
             text-align: left;
             transition: width 0.3s ease;
-            /* Eliminado max-width para forzar el tamaño real elegido */
         }
 
         .receipt-header {
@@ -283,7 +281,7 @@
         .receipt-client span { font-weight: normal; }
         .receipt-date-sub { font-size: 13px; font-weight: normal; color: #333; }
 
-        /* Tabla de detalles estilo ticket (CORRECCIONES DE TAMAÑO DE LETRA) */
+        /* Tabla de detalles estilo ticket (AJUSTADO PARA NO BAJAR NUNCA) */
         .receipt-table-block {
             border: 1.5px solid #000000;
             width: 100%;
@@ -294,7 +292,7 @@
         .receipt-table-block th {
             background-color: #000000;
             color: #ffffff;
-            font-size: 12px; /* Reducido para evitar saltos */
+            font-size: 12px;
             font-weight: bold;
             padding: 6px 4px;
             text-align: center;
@@ -302,53 +300,67 @@
         }
 
         .receipt-table-block td {
-            padding: 8px 4px; /* Menos relleno en celular */
-            font-size: 13px; /* Reducido de 14px */
+            padding: 8px 4px;
+            font-size: 13px; 
             vertical-align: top;
         }
 
         .receipt-dots-row {
             display: flex;
             justify-content: space-between;
-            align-items: flex-end;
+            align-items: center; /* Centrado vertical */
             margin-bottom: 6px;
             width: 100%;
+            overflow: hidden; /* Seguridad extra */
         }
 
-        /* FORZAR UNA SOLA LÍNEA */
         .receipt-label { 
             font-weight: normal; 
             padding-right: 4px; 
             white-space: nowrap; 
             overflow: hidden; 
             text-overflow: ellipsis; 
-            max-width: 65%; /* Evita que el concepto empuje el precio */
+            flex-shrink: 1; /* Permite encoger este texto si es muy largo */
         }
         .receipt-dots {
             flex-grow: 1;
             border-bottom: 1.5px dotted #000;
             margin-bottom: 4px;
             min-width: 10px;
+            flex-shrink: 0; /* Impide que los puntos desaparezcan */
         }
         .receipt-value { 
             padding-left: 4px; 
             font-weight: normal; 
             white-space: nowrap; 
+            flex-shrink: 0; /* JAMÁS encoger el precio */
         }
 
         .receipt-total-bar {
-            font-size: 13px; /* Reducido de 15px */
+            font-size: 12px; 
             font-weight: bold;
             margin-top: 12px;
             text-align: left;
             display: flex;
             justify-content: space-between;
+            align-items: center;
             border-bottom: 1px solid #000;
             padding-bottom: 5px;
+            width: 100%;
+            overflow: hidden;
         }
         
-        .receipt-total-bar span {
-            white-space: nowrap; /* Evita que SALDO TOTAL salte a otra línea */
+        #preview-total-label {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex-shrink: 1;
+            padding-right: 5px;
+        }
+        
+        #preview-total-val {
+            white-space: nowrap;
+            flex-shrink: 0;
         }
 
         .receipt-footer-msg {
@@ -361,24 +373,24 @@
 
         /* CLASE ESPECIAL PARA MODO TICKET ANGOSTO EXTREMO (300px) */
         .narrow-ticket .receipt-table-block th {
-            font-size: 10.5px;
+            font-size: 10px;
             padding: 4px 2px;
         }
         .narrow-ticket .receipt-table-block td {
-            padding: 6px 2px;
+            padding: 5px 2px;
+            font-size: 11.5px;
         }
         .narrow-ticket .receipt-dots-row {
-            font-size: 11.5px;
             margin-bottom: 4px;
         }
         .narrow-ticket .receipt-client {
             font-size: 12px;
         }
         .narrow-ticket .receipt-title {
-            font-size: 17px;
+            font-size: 16px;
         }
         .narrow-ticket .receipt-total-bar {
-            font-size: 11.5px;
+            font-size: 10.5px;
         }
 
         /* Historial y utilidades */
@@ -656,9 +668,11 @@
             document.getElementById('logo-size-display').innerText = logoSizeVal + 'px';
             const widthVal = document.getElementById('factura-ancho').value;
 
-            // Ajustar ancho del recibo y aplicar clase narrow-ticket si es necesario
+            // Ajustar ancho del recibo (FORZADO CON MAX Y MIN PARA MÓVIL)
             const previewContainer = document.getElementById('recibo-preview');
             previewContainer.style.width = widthVal + 'px';
+            previewContainer.style.minWidth = widthVal + 'px';
+            previewContainer.style.maxWidth = widthVal + 'px';
             
             if (widthVal === "300") {
                 previewContainer.classList.add('narrow-ticket');
