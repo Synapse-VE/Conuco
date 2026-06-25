@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Facturador Conuco Offline</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #d32f2f;
+            --primary-dark: #b71c1c;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --border-color: #cccccc;
+            --accent-color: #2e7d32;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding-bottom: 60px;
+            font-size: 16px;
+        }
+
+        /* Barra de Navegación Móvil Superior */
+        .navbar {
+            background-color: #1a1a1a;
+            color: white;
+            display: flex;
+            justify-content: space-around;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .nav-btn {
+            background: none;
+            border: none;
+            color: #aaa;
+            padding: 15px 10px;
+            font-size: 14px;
+            font-weight: bold;
+            flex: 1;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .nav-btn.active {
+            color: white;
+            border-bottom: 3px solid var(--primary-color);
+            background-color: rgba(255,255,255,0.05);
+        }
+
+        /* Contenedores de Sección */
+        .section-panel {
+            display: none;
+            padding: 15px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .section-panel.active {
+            display: block;
+        }
+
+        h2 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #1a1a1a;
+            border-left: 4px solid var(--primary-color);
+            padding-left: 8px;
+        }
+
+        /* Tarjetas de Formulario */
+        .card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 15px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
+        .form-control, select, textarea {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px; 
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background-color: #fafafa;
+            color: #222;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        /* Deslizador de tamaño */
+        input[type="range"] {
+            padding: 0;
+            height: 6px;
+            background: #ddd;
+            border-radius: 5px;
+            appearance: none;
+            outline: none;
+            width: 100%;
+            margin-top: 5px;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .form-control:focus, select:focus, textarea:focus {
+            border-color: var(--primary-color);
+            background-color: #fff;
+        }
+
+        .row-flex {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .flex-1 { flex: 1; }
+        .flex-2 { flex: 2; }
+
+        /* Botones del Sistema */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 16px;
+            font-size: 15px;
+            font-weight: bold;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            width: 100%;
+            text-align: center;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary { background-color: var(--primary-color); color: white; }
+        .btn-primary:hover { background-color: var(--primary-dark); }
+        .btn-success { background-color: var(--accent-color); color: white; }
+        .btn-secondary { background-color: #607d8b; color: white; }
+        .btn-danger { background-color: #e53935; color: white; }
+        
+        .btn-sm {
+            padding: 8px 12px;
+            font-size: 13px;
+            width: auto;
+        }
+
+        /* DISEÑO DE LA FACTURA ADAPTABLE */
+        .receipt-container-box {
+            background-color: #e0e0e0;
+            padding: 10px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin-top: 15px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .receipt-preview {
+            background-color: #ffffff;
+            width: 420px;
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 25px 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            font-family: 'Arial', sans-serif;
+            color: #000000;
+            position: relative;
+            transition: width 0.3s ease;
+        }
+
+        .receipt-header {
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .receipt-logo-area {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+
+        .receipt-logo-img {
+            max-width: 200px;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .receipt-logo-text {
+            color: #c62828;
+            font-size: 42px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-shadow: 1px 1px 0px #000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .receipt-logo-text::before { content: '🐓'; font-size: 24px; }
+        .receipt-logo-text::after { content: '🌽'; font-size: 24px; }
+
+        .receipt-title {
+            font-size: 22px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-top: 5px;
+            letter-spacing: 0.5px;
+            border-top: 2px solid #e0a92e;
+            padding-top: 5px;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .receipt-client {
+            font-size: 15px;
+            margin: 15px 0 8px 0;
+            text-align: left;
+            font-weight: bold;
+            line-height: 1.4;
+        }
+        .receipt-client span { font-weight: normal; }
+        .receipt-date-sub { font-size: 13px; font-weight: normal; color: #333; }
+
+        /* Tabla de detalles estilo ticket */
+        .receipt-table-block {
+            border: 1.5px solid #000000;
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 5px;
+        }
+
+        .receipt-table-block th {
+            background-color: #000000;
+            color: #ffffff;
+            font-size: 13px;
+            font-weight: bold;
+            padding: 6px 4px;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        .receipt-table-block td {
+            padding: 10px 6px;
+            font-size: 14px;
+            vertical-align: top;
+        }
+
+        .receipt-dots-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 8px;
+        }
+
+        .receipt-label { font-weight: normal; padding-right: 4px; }
+        .receipt-dots {
+            flex-grow: 1;
+            border-bottom: 1.5px dotted #000;
+            margin-bottom: 4px;
+            min-width: 15px;
+        }
+        .receipt-value { padding-left: 4px; font-weight: normal; white-space: nowrap; }
+
+        .receipt-total-bar {
+            font-size: 15px;
+            font-weight: bold;
+            margin-top: 15px;
+            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #000;
+            padding-bottom: 5px;
+        }
+
+        .receipt-footer-msg {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 14px;
+            line-height: 1.4;
+            white-space: pre-line;
+        }
+
+        /* CLASE ESPECIAL PARA MODO TICKET ANGOSTO */
+        .narrow-ticket .receipt-table-block th {
+            font-size: 11px;
+            padding: 4px 2px;
+        }
+        .narrow-ticket .receipt-table-block td {
+            padding: 6px 4px;
+        }
+        .narrow-ticket .receipt-dots-row {
+            font-size: 11.5px;
+            margin-bottom: 5px;
+        }
+        .narrow-ticket .receipt-client {
+            font-size: 13px;
+        }
+        .narrow-ticket .receipt-title {
+            font-size: 18px;
+        }
+
+        /* Historial y utilidades */
+        .history-item {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            border-left: 4px solid var(--primary-color);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        }
+        .history-item.status-cancelado { border-left-color: var(--accent-color); }
+        .history-item.status-abono { border-left-color: #ff9800; }
+        .history-item.status-presupuesto { border-left-color: #00bcd4; }
+        .history-meta { display: flex; justify-content: space-between; font-size: 12px; color: #666; margin-bottom: 5px; }
+        .history-title { font-weight: bold; font-size: 15px; margin-bottom: 3px; }
+        .mt-10 { margin-top: 10px; }
+        .badge { padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; color: white; text-transform: uppercase; }
+        .bg-pendiente { background-color: var(--primary-color); }
+        .bg-cancelado { background-color: var(--accent-color); }
+        .bg-abono { background-color: #ff9800; }
+        .bg-presupuesto { background-color: #00bcd4; }
+        .client-tag { display: inline-flex; align-items: center; background: #e0e0e0; padding: 5px 10px; border-radius: 20px; margin: 4px; font-size: 14px; }
+        .client-tag remove { margin-left: 8px; color: #c62828; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <button class="nav-btn active" onclick="switchTab('nueva-factura')">📝 Facturar</button>
+        <button class="nav-btn" onclick="switchTab('historial')">📊 Historial</button>
+        <button class="nav-btn" onclick="switchTab('datos')">⚙️ Ajustes</button>
+    </div>
+
+    <div id="nueva-factura" class="section-panel active">
+        <h2>Generar Recibo Dinámico</h2>
+        
+        <div class="card">
+            <div class="form-group">
+                <label for="factura-categoria">Categoría / Estado:</label>
+                <select id="factura-categoria" onchange="updatePreview()">
+                    <option value="pendiente">Cuenta Pendiente</option>
+                    <option value="cancelado">Cuenta Cancelada</option>
+                    <option value="abono">Abono Realizado</option>
+                    <option value="presupuesto">Presupuesto / Cotización</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="factura-logo">Seleccionar Logo:</label>
+                <select id="factura-logo" onchange="updatePreview()">
+                    <option value="default">Logo Conuco Predeterminado</option>
+                </select>
+            </div>
+
+            <div class="form-group mt-10">
+                <label for="factura-logo-size">
+                    Tamaño del Logo: <span id="logo-size-display" style="color:var(--primary-color); font-weight:bold;">200px</span>
+                </label>
+                <input type="range" id="factura-logo-size" class="form-control" min="50" max="350" step="10" value="200" list="logo-ticks" oninput="updatePreview(); guardarAjustesDiseno();">
+                <datalist id="logo-ticks">
+                    <option value="100"></option>
+                    <option value="150"></option>
+                    <option value="200"></option>
+                    <option value="250"></option>
+                    <option value="300"></option>
+                </datalist>
+            </div>
+        </div>
+
+        <div class="card">
+            <label style="display:block; font-size:14px; font-weight:600; margin-bottom:8px; color:#555;">Formato y Proporción del Recibo:</label>
+            <select id="factura-ancho" class="form-control" onchange="updatePreview(); guardarAjustesDiseno();">
+                <option value="300">Formato Ticket Angosto (300px)</option>
+                <option value="420" selected>Formato Estándar Móvil (420px)</option>
+                <option value="550">Formato Ancho Completo (550px)</option>
+            </select>
+        </div>
+
+        <div class="card">
+            <div class="form-group">
+                <label for="factura-cliente">Cliente:</label>
+                <div class="row-flex">
+                    <input type="text" id="factura-cliente" class="form-control flex-1" list="lista-clientes-datalist" placeholder="Nombre del cliente" oninput="updatePreview()">
+                    <button class="btn btn-success btn-sm" style="width: auto; height: 45px;" onclick="saveQuickClient()">💾 Guardar</button>
+                </div>
+                <datalist id="lista-clientes-datalist"></datalist>
+            </div>
+
+            <div class="form-group">
+                <label for="factura-fecha">Fecha y Hora:</label>
+                <input type="datetime-local" id="factura-fecha" class="form-control" onchange="updatePreview()">
+            </div>
+        </div>
+
+        <div class="card">
+            <label style="display:block; font-size:14px; font-weight:600; margin-bottom:8px; color:#555;">Conceptos del Recibo:</label>
+            <div id="items-container">
+            </div>
+            <button class="btn btn-secondary btn-sm mt-10" onclick="addItemRow()">➕ Agregar Concepto</button>
+        </div>
+
+        <div class="card">
+            <div class="form-group">
+                <label for="factura-footer">Mensaje al Final:</label>
+                <textarea id="factura-footer" rows="2" placeholder="Escribe el agradecimiento..." oninput="updatePreview()"></textarea>
+            </div>
+            <div class="row-flex">
+                <button class="btn btn-secondary btn-sm" onclick="applyPresetFooter('pendiente')">Set Pendiente</button>
+                <button class="btn btn-secondary btn-sm" onclick="applyPresetFooter('cancelado')">Set Cancelado</button>
+            </div>
+        </div>
+
+        <button class="btn btn-primary" onclick="guardarYCompartirFactura()">📦 Guardar Historial y Compartir Recibo</button>
+
+        <h2 class="mt-10">Vista Previa (Diseño Final)</h2>
+        <div class="receipt-container-box">
+            <div id="recibo-preview" class="receipt-preview">
+                
+                <div class="receipt-header">
+                    <div class="receipt-logo-area" id="preview-logo-container">
+                        <div class="receipt-logo-text">CONUCO</div>
+                    </div>
+                    <div class="receipt-title" id="preview-title">CUENTA PENDIENTE</div>
+                </div>
+
+                <div class="receipt-client">
+                    CLIENTE: <span id="preview-cliente">Heidi Durán</span><br>
+                    <span class="receipt-date-sub">FECHA: <span id="preview-fecha">16/06/2026 05:26 PM</span></span>
+                </div>
+
+                <table class="receipt-table-block">
+                    <thead>
+                        <tr>
+                            <th id="preview-table-header">DETALLE DE LA CUENTA (COP)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td id="preview-items-td">
+                                <div id="preview-dynamic-items">
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="receipt-total-bar">
+                    <span id="preview-total-label">SALDO TOTAL PENDIENTE:</span>
+                    <span id="preview-total-val">COP$ 0</span>
+                </div>
+
+                <div class="receipt-footer-msg" id="preview-footer"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="historial" class="section-panel">
+        <h2>Historial de Recibos Emitidos</h2>
+        <div class="card">
+            <div class="form-group">
+                <input type="text" id="search-historial" class="form-control" placeholder="🔍 Buscar por cliente o concepto..." oninput="renderHistorial()">
+            </div>
+        </div>
+        <div id="historial-lista"></div>
+    </div>
+
+    <div id="datos" class="section-panel">
+        <h2>Configuración de Logos</h2>
+        <div class="card">
+            <div class="form-group">
+                <label>Subir nuevo Logo desde el Celular:</label>
+                <input type="file" id="upload-logo" class="form-control" accept="image/*" onchange="processLogoUpload(event)">
+                <p style="font-size:12px; color:#666; margin-top:5px;">El logo se guardará en la memoria interna de la app para usarlo cuando quieras.</p>
+            </div>
+            <div id="lista-logos-guardados" style="margin-top:10px;"></div>
+        </div>
+
+        <h2>Gestión de Clientes Registrados</h2>
+        <div class="card">
+            <div id="lista-clientes-tags"></div>
+        </div>
+
+        <h2>Copia de Seguridad Portátil (Offline)</h2>
+        <div class="card">
+            <button class="btn btn-success" style="margin-bottom:10px;" onclick="exportarSistemaJSON()">📤 Descargar Respaldo (JSON)</button>
+            <label style="display:block; font-size:14px; font-weight:600; margin-bottom:5px; color:#555;">Importar Respaldo:</label>
+            <input type="file" id="import-json-file" class="form-control" accept=".json" onchange="importarSistemaJSON(event)">
+        </div>
+        
+        <button class="btn btn-danger" onclick="limpiarTodoElSistema()">⚠️ Borrar Absolutamente Todo</button>
+    </div>
+
+    <script>
+        // BASE DE DATOS LOCAL
+        let db = {
+            clientes: ["Heidi Durán (Carnicería)", "Juan Pérez", "Abasto Los Llanos"],
+            logos: [],
+            facturas: [],
+            config: {
+                logoSize: 200,
+                receiptWidth: 420
+            }
+        };
+
+        window.addEventListener('DOMContentLoaded', () => {
+            cargarDeLocalStorage();
+            setFechaActual();
+            
+            if (db.facturas.length === 0) {
+                document.getElementById('factura-cliente').value = "Heidi Durán (Carnicería)";
+                addItemRow("12 pollos (29 kg 650 g total)", 355800);
+            } else {
+                addItemRow("", "");
+            }
+
+            applyPresetFooter('pendiente');
+            updatePreview();
+        });
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.section-panel').forEach(panel => panel.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+
+            if (tabId === 'historial') renderHistorial();
+            if (tabId === 'datos') renderAjustes();
+        }
+
+        function setFechaActual() {
+            const ahora = new Date();
+            ahora.setMinutes(ahora.getMinutes() - ahora.getTimezoneOffset());
+            document.getElementById('factura-fecha').value = ahora.toISOString().slice(0, 16);
+        }
+
+        function addItemRow(concepto = "", monto = "") {
+            const container = document.getElementById('items-container');
+            const rowId = 'row-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4);
+            const div = document.createElement('div');
+            div.className = 'row-flex mt-10';
+            div.id = rowId;
+            div.innerHTML = `
+                <div class="flex-2">
+                    <input type="text" class="form-control item-concepto" placeholder="Ej. 12 pollos (29 kg)" value="${concepto}" oninput="updatePreview()">
+                </div>
+                <div class="flex-1">
+                    <input type="number" class="form-control item-monto" placeholder="Monto $" value="${monto}" oninput="updatePreview()" inputmode="numeric">
+                </div>
+                <button class="btn btn-danger btn-sm" style="width:auto; height:45px;" onclick="removeItemRow('${rowId}')">❌</button>
+            `;
+            container.appendChild(div);
+            updatePreview();
+        }
+
+        function removeItemRow(id) {
+            const row = document.getElementById(id);
+            if (row) row.remove();
+            updatePreview();
+        }
+
+        function updatePreview() {
+            const categoria = document.getElementById('factura-categoria').value;
+            const cliente = document.getElementById('factura-cliente').value || "Cliente General";
+            const fechaVal = document.getElementById('factura-fecha').value;
+            const footerText = document.getElementById('factura-footer').value;
+            const logoSel = document.getElementById('factura-logo').value;
+            
+            // Medidas de diseño y actualización del contador visual
+            const logoSizeVal = document.getElementById('factura-logo-size').value;
+            document.getElementById('logo-size-display').innerText = logoSizeVal + 'px';
+            const widthVal = document.getElementById('factura-ancho').value;
+
+            // Ajustar ancho del recibo y aplicar clase narrow-ticket si es necesario
+            const previewContainer = document.getElementById('recibo-preview');
+            previewContainer.style.width = widthVal + 'px';
+            
+            if (widthVal === "300") {
+                previewContainer.classList.add('narrow-ticket');
+            } else {
+                previewContainer.classList.remove('narrow-ticket');
+            }
+
+            const previewTitle = document.getElementById('preview-title');
+            const previewTableHeader = document.getElementById('preview-table-header');
+            const previewTotalLabel = document.getElementById('preview-total-label');
+
+            if (categoria === 'pendiente') {
+                previewTitle.innerText = "CUENTA PENDIENTE";
+                previewTableHeader.innerText = "DETALLE DE LA CUENTA PENDIENTE (COP)";
+                previewTotalLabel.innerText = "SALDO TOTAL PENDIENTE:";
+            } else if (categoria === 'cancelado') {
+                previewTitle.innerText = "CUENTA CANCELADA";
+                previewTableHeader.innerText = "DETALLE DE LA CUENTA CANCELADA (COP)";
+                previewTotalLabel.innerText = "TOTAL CANCELADO:";
+            } else if (categoria === 'abono') {
+                previewTitle.innerText = "ABONO REALIZADO";
+                previewTableHeader.innerText = "DETALLE DEL ABONO / ENTREGA (COP)";
+                previewTotalLabel.innerText = "TOTAL ABONADO:";
+            } else if (categoria === 'presupuesto') {
+                previewTitle.innerText = "PRESUPUESTO";
+                previewTableHeader.innerText = "DETALLE DE COTIZACIÓN (COP)";
+                previewTotalLabel.innerText = "TOTAL ESTIMADO:";
+            }
+
+            // Cargar Logo Seleccionado con el Tamaño Ajustado
+            const logoContainer = document.getElementById('preview-logo-container');
+            if (logoSel === 'default') {
+                logoContainer.innerHTML = `<div class="receipt-logo-text">CONUCO</div>`;
+            } else {
+                const foundLogo = db.logos.find(l => l.id === logoSel);
+                if (foundLogo) {
+                    logoContainer.innerHTML = `<img src="${foundLogo.base64}" class="receipt-logo-img" style="max-width: ${logoSizeVal}px;" alt="Logo">`;
+                } else {
+                    logoContainer.innerHTML = `<div class="receipt-logo-text">CONUCO</div>`;
+                }
+            }
+
+            // Cliente y Fecha
+            document.getElementById('preview-cliente').innerText = cliente;
+            
+            if (fechaVal) {
+                const f = new Date(fechaVal);
+                const dia = String(f.getDate()).padStart(2, '0');
+                const mes = String(f.getMonth() + 1).padStart(2, '0');
+                const anio = f.getFullYear();
+                let horas = f.getHours();
+                const minutos = String(f.getMinutes()).padStart(2, '0');
+                const ampm = horas >= 12 ? 'PM' : 'AM';
+                horas = horas % 12;
+                horas = horas ? horas : 12; 
+                document.getElementById('preview-fecha').innerText = `${dia}/${mes}/${anio} ${String(horas).padStart(2, '0')}:${minutos} ${ampm}`;
+            }
+
+            // Inyectar Ítems
+            const dynamicContainer = document.getElementById('preview-dynamic-items');
+            dynamicContainer.innerHTML = "";
+            let totalAcumulado = 0;
+            const conceptosInputs = document.querySelectorAll('.item-concepto');
+            const montosInputs = document.querySelectorAll('.item-monto');
+
+            conceptosInputs.forEach((input, index) => {
+                const conceptoText = input.value || "Concepto general";
+                const montoVal = parseFloat(montosInputs[index].value) || 0;
+                totalAcumulado += montoVal;
+
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'receipt-dots-row';
+                rowDiv.innerHTML = `
+                    <span class="receipt-label">${conceptoText}</span>
+                    <span class="receipt-dots"></span>
+                    <span class="receipt-value">COP$ ${formatearMoneda(montoVal)}</span>
+                `;
+                dynamicContainer.appendChild(rowDiv);
+            });
+
+            document.getElementById('preview-total-val').innerText = "COP$ " + formatearMoneda(totalAcumulado);
+            document.getElementById('preview-footer').innerText = footerText;
+        }
+
+        function formatearMoneda(valor) {
+            return new Intl.NumberFormat('de-DE').format(valor); 
+        }
+
+        function applyPresetFooter(tipo) {
+            if (tipo === 'pendiente') {
+                document.getElementById('factura-footer').value = "Muchísimas gracias por su compra y preferencia!\nEsperamos su pronto pago.";
+            } else {
+                document.getElementById('factura-footer').value = "Muchísimas gracias por su compra y preferencia!\nCuenta totalmente procesada con éxito.";
+            }
+            updatePreview();
+        }
+
+        function saveQuickClient() {
+            const nombre = document.getElementById('factura-cliente').value.trim();
+            if (!nombre) return alert("Escribe un nombre de cliente válido.");
+            if (!db.clientes.includes(nombre)) {
+                db.clientes.push(nombre);
+                guardarEnLocalStorage();
+                actualizarDatalistClientes();
+                alert("Cliente '" + nombre + "' guardado en la memoria.");
+            } else {
+                alert("Este cliente ya estaba registrado.");
+            }
+        }
+
+        function actualizarDatalistClientes() {
+            const dl = document.getElementById('lista-clientes-datalist');
+            dl.innerHTML = "";
+            db.clientes.forEach(c => {
+                const op = document.createElement('option');
+                op.value = c;
+                dl.appendChild(op);
+            });
+        }
+
+        function guardarAjustesDiseno() {
+            if (!db.config) db.config = {};
+            db.config.logoSize = document.getElementById('factura-logo-size').value;
+            db.config.receiptWidth = document.getElementById('factura-ancho').value;
+            guardarEnLocalStorage();
+        }
+
+        function guardarYCompartirFactura() {
+            const categoria = document.getElementById('factura-categoria').value;
+            const cliente = document.getElementById('factura-cliente').value || "Cliente General";
+            const fechaVal = document.getElementById('factura-fecha').value;
+            
+            let total = 0;
+            let conceptosArray = [];
+            const conceptosInputs = document.querySelectorAll('.item-concepto');
+            const montosInputs = document.querySelectorAll('.item-monto');
+
+            conceptosInputs.forEach((input, index) => {
+                const cText = input.value || "Concepto";
+                const mVal = parseFloat(montosInputs[index].value) || 0;
+                total += mVal;
+                conceptosArray.push({ concepto: cText, monto: mVal });
+            });
+
+            const nuevaFactura = {
+                id: 'fac-' + Date.now(),
+                categoria: categoria,
+                cliente: cliente,
+                fecha: fechaVal,
+                items: conceptosArray,
+                total: total
+            };
+
+            db.facturas.unshift(nuevaFactura); 
+            guardarEnLocalStorage();
+
+            if (!db.clientes.includes(cliente) && cliente !== "Cliente General") {
+                db.clientes.push(cliente);
+                guardarEnLocalStorage();
+                actualizarDatalistClientes();
+            }
+
+            const targetElement = document.getElementById('recibo-preview');
+            html2canvas(targetElement, {
+                scale: 2, 
+                useCORS: true,
+                backgroundColor: "#ffffff"
+            }).then(canvas => {
+                canvas.toBlob(blob => {
+                    const file = new File([blob], `Recibo-${cliente.replace(/[^a-zA-Z0-9]/g, "_")}.png`, { type: 'image/png' });
+                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                        navigator.share({
+                            files: [file],
+                            title: 'Recibo Conuco',
+                            text: `Recibo de cuenta de ${cliente}`
+                        }).catch(err => {
+                            descargarImagenFallback(canvas, cliente);
+                        });
+                    } else {
+                        descargarImagenFallback(canvas, cliente);
+                    }
+                }, 'image/png');
+            });
+        }
+
+        function descargarImagenFallback(canvas, cliente) {
+            const lnk = document.createElement('a');
+            lnk.download = `Recibo-${cliente.replace(/[^a-zA-Z0-9]/g, "_")}.png`;
+            lnk.href = canvas.toDataURL('image/png');
+            lnk.click();
+            alert("Recibo guardado en el historial. Se inició la descarga de la imagen en tu galería para mandarla por WhatsApp.");
+        }
+
+        function processLogoUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64String = e.target.result;
+                const nuevoLogo = { id: 'logo-' + Date.now(), nombre: file.name, base64: base64String };
+                db.logos.push(nuevoLogo);
+                guardarEnLocalStorage();
+                renderSelectorLogos();
+                renderAjustes();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function renderSelectorLogos() {
+            const sel = document.getElementById('factura-logo');
+            const currentSelection = sel.value;
+            sel.innerHTML = '<option value="default">Logo Conuco Predeterminado</option>';
+            db.logos.forEach(l => {
+                const op = document.createElement('option');
+                op.value = l.id;
+                op.innerText = l.nombre;
+                sel.appendChild(op);
+            });
+            if([...sel.options].some(o => o.value === currentSelection)){
+                sel.value = currentSelection;
+            }
+        }
+
+        function eliminarLogo(id) {
+            if (confirm("¿Quieres eliminar este logo permanentemente?")) {
+                db.logos = db.logos.filter(l => l.id !== id);
+                guardarEnLocalStorage();
+                renderSelectorLogos();
+                renderAjustes();
+                updatePreview();
+            }
+        }
+
+        function renderHistorial() {
+            const query = document.getElementById('search-historial').value.toLowerCase();
+            const container = document.getElementById('historial-lista');
+            container.innerHTML = "";
+
+            const filtradas = db.facturas.filter(f => 
+                f.cliente.toLowerCase().includes(query) || 
+                f.items.some(i => i.concepto.toLowerCase().includes(query))
+            );
+
+            if (filtradas.length === 0) {
+                container.innerHTML = "<p style='text-align:center;color:#666;padding:20px;'>No se encontraron recibos guardados.</p>";
+                return;
+            }
+
+            filtradas.forEach(f => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = `history-item status-${f.categoria}`;
+                let resumenConceptos = f.items.map(i => i.concepto).join(', ');
+                if (resumenConceptos.length > 50) resumenConceptos = resumenConceptos.substring(0, 50) + "...";
+
+                itemDiv.innerHTML = `
+                    <div class="history-meta">
+                        <span>📅 ${f.fecha ? f.fecha.replace('T', ' ') : 'S/F'}</span>
+                        <span class="badge bg-${f.categoria}">${f.categoria}</span>
+                    </div>
+                    <div class="history-title">${f.cliente}</div>
+                    <div style="font-size: 14px; color:#555; margin-bottom:8px;">${resumenConceptos}</div>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <strong style="color:#000; font-size:16px;">COP$ ${formatearMoneda(f.total)}</strong>
+                        <div>
+                            <button class="btn btn-secondary btn-sm" style="width:auto; padding:5px 10px;" onclick="cargarFacturaParaEditar('${f.id}')">🔄 Cargar</button>
+                            <button class="btn btn-danger btn-sm" style="width:auto; padding:5px 10px;" onclick="eliminarFacturaHistorial('${f.id}')">🗑️</button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(itemDiv);
+            });
+        }
+
+        function cargarFacturaParaEditar(id) {
+            const fac = db.facturas.find(f => f.id === id);
+            if (!fac) return;
+            document.getElementById('factura-categoria').value = fac.categoria;
+            document.getElementById('factura-cliente').value = fac.cliente;
+            document.getElementById('factura-fecha').value = fac.fecha;
+
+            const container = document.getElementById('items-container');
+            container.innerHTML = "";
+            fac.items.forEach(i => addItemRow(i.concepto, i.monto));
+
+            switchTab('nueva-factura');
+            updatePreview();
+        }
+
+        function eliminarFacturaHistorial(id) {
+            if (confirm("¿Seguro que quieres eliminar este recibo del historial?")) {
+                db.facturas = db.facturas.filter(f => f.id !== id);
+                guardarEnLocalStorage();
+                renderHistorial();
+            }
+        }
+
+        function renderAjustes() {
+            const clientContainer = document.getElementById('lista-clientes-tags');
+            clientContainer.innerHTML = "";
+            db.clientes.forEach(c => {
+                const tag = document.createElement('span');
+                tag.className = 'client-tag';
+                tag.innerHTML = `${c} <remove onclick="eliminarCliente('${c}')">×</remove>`;
+                clientContainer.appendChild(tag);
+            });
+
+            const logosContainer = document.getElementById('lista-logos-guardados');
+            logosContainer.innerHTML = "";
+            if (db.logos.length === 0) {
+                logosContainer.innerHTML = "<p style='font-size:13px; color:#888;'>No hay logos personalizados subidos.</p>";
+            } else {
+                db.logos.forEach(l => {
+                    const d = document.createElement('div');
+                    d.style = "display:flex; align-items:center; justify-content:between; margin: 6px 0; background:#f0f0f0; padding:5px; border-radius:4px;";
+                    d.innerHTML = `
+                        <img src="${l.base64}" style="height:35px; width:60px; object-fit:contain; background:white; margin-right:10px;">
+                        <span style="flex:1; font-size:13px; overflow:hidden; text-overflow:ellipsis;">${l.nombre}</span>
+                        <button class="btn btn-danger btn-sm" style="width:auto; padding:2px 6px;" onclick="eliminarLogo('${l.id}')">Borrar</button>
+                    `;
+                    logosContainer.appendChild(d);
+                });
+            }
+        }
+
+        function eliminarCliente(nombre) {
+            db.clientes = db.clientes.filter(c => c !== nombre);
+            guardarEnLocalStorage();
+            actualizarDatalistClientes();
+            renderAjustes();
+        }
+
+        function exportarSistemaJSON() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(db));
+            const dlAnchor = document.createElement('a');
+            dlAnchor.setAttribute("href", dataStr);
+            dlAnchor.setAttribute("download", `CONUCO_RESPALDO_${new Date().toISOString().slice(0,10)}.json`);
+            dlAnchor.click();
+        }
+
+        function importarSistemaJSON(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const jsonCargado = JSON.parse(e.target.result);
+                    if (jsonCargado.clientes && jsonCargado.facturas) {
+                        db = jsonCargado;
+                        guardarEnLocalStorage();
+                        actualizarDatalistClientes();
+                        renderSelectorLogos();
+                        
+                        // Restaurar configuraciones visuales tras importar
+                        if(db.config) {
+                            if(db.config.logoSize) {
+                                document.getElementById('factura-logo-size').value = db.config.logoSize;
+                                document.getElementById('logo-size-display').innerText = db.config.logoSize + 'px';
+                            }
+                            if(db.config.receiptWidth) document.getElementById('factura-ancho').value = db.config.receiptWidth;
+                        }
+                        
+                        updatePreview();
+                        alert("¡Respaldo importado y restaurado con éxito, hermano! Todo está en su sitio.");
+                    } else {
+                        alert("El archivo no parece ser un respaldo válido del sistema.");
+                    }
+                } catch (err) {
+                    alert("Error leyendo el archivo JSON.");
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        function limpiarTodoElSistema() {
+            if (confirm("⚠️ ¿Estás COMPLETAMENTE seguro de vaciar la app? Perderás clientes, logos e historial.")) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+
+        function guardarEnLocalStorage() {
+            localStorage.setItem('conuco_offline_db', JSON.stringify(db));
+        }
+
+        function cargarDeLocalStorage() {
+            const localData = localStorage.getItem('conuco_offline_db');
+            if (localData) {
+                try {
+                    db = JSON.parse(localData);
+                    // Cargar preferencias visuales guardadas
+                    if(db.config) {
+                        if(db.config.logoSize) {
+                            document.getElementById('factura-logo-size').value = db.config.logoSize;
+                            document.getElementById('logo-size-display').innerText = db.config.logoSize + 'px';
+                        }
+                        if(db.config.receiptWidth) document.getElementById('factura-ancho').value = db.config.receiptWidth;
+                    }
+                } catch(e) {
+                    console.error("Error al parsear datos de localStorage");
+                }
+            }
+            actualizarDatalistClientes();
+            renderSelectorLogos();
+        }
+    </script>
+</body>
+</html>
