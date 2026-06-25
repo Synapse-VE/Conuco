@@ -1,5 +1,5 @@
 {
-  "name": "Facturador Conuco Offline",
+  "name": "Facturador Conuco",
   "short_name": "Conuco",
   "start_url": "./index.html",
   "display": "standalone",

@@ -66,6 +66,22 @@
             background-color: rgba(255,255,255,0.05);
         }
 
+        /* BANNER DE INSTALACIÓN PWA */
+        #install-banner {
+            display: none;
+            background-color: #1976D2;
+            color: white;
+            text-align: center;
+            padding: 12px;
+            font-weight: bold;
+            font-size: 15px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        #install-banner:active {
+            background-color: #1565C0;
+        }
+
         /* Contenedores de Sección */
         .section-panel {
             display: none;
@@ -186,28 +202,28 @@
             width: auto;
         }
 
-        /* DISEÑO DE LA FACTURA ADAPTABLE */
+        /* DISEÑO DE LA FACTURA ADAPTABLE (CORREGIDO PARA SCROLL MÓVIL) */
         .receipt-container-box {
             background-color: #e0e0e0;
             padding: 10px;
             border-radius: 8px;
-            overflow-x: auto;
+            overflow-x: auto; /* Permite deslizar si el recibo es más grande que la pantalla */
             margin-top: 15px;
-            display: flex;
-            justify-content: center;
+            text-align: center; /* Quitado flex para evitar cortes al hacer scroll */
         }
 
         .receipt-preview {
             background-color: #ffffff;
-            width: 420px;
-            max-width: 100%;
-            margin: 0 auto;
+            width: 420px; 
+            margin: 0 auto; /* Centrar con margen automático */
             padding: 25px 20px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.15);
             font-family: 'Arial', sans-serif;
             color: #000000;
             position: relative;
+            text-align: left;
             transition: width 0.3s ease;
+            /* Eliminado max-width para forzar el tamaño real elegido */
         }
 
         .receipt-header {
@@ -239,6 +255,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            justify-content: center;
         }
         .receipt-logo-text::before { content: '🐓'; font-size: 24px; }
         .receipt-logo-text::after { content: '🌽'; font-size: 24px; }
@@ -253,10 +270,11 @@
             padding-top: 5px;
             display: inline-block;
             width: 100%;
+            text-align: center;
         }
 
         .receipt-client {
-            font-size: 15px;
+            font-size: 14px;
             margin: 15px 0 8px 0;
             text-align: left;
             font-weight: bold;
@@ -265,7 +283,7 @@
         .receipt-client span { font-weight: normal; }
         .receipt-date-sub { font-size: 13px; font-weight: normal; color: #333; }
 
-        /* Tabla de detalles estilo ticket */
+        /* Tabla de detalles estilo ticket (CORRECCIONES DE TAMAÑO DE LETRA) */
         .receipt-table-block {
             border: 1.5px solid #000000;
             width: 100%;
@@ -276,7 +294,7 @@
         .receipt-table-block th {
             background-color: #000000;
             color: #ffffff;
-            font-size: 13px;
+            font-size: 12px; /* Reducido para evitar saltos */
             font-weight: bold;
             padding: 6px 4px;
             text-align: center;
@@ -284,8 +302,8 @@
         }
 
         .receipt-table-block td {
-            padding: 10px 6px;
-            font-size: 14px;
+            padding: 8px 4px; /* Menos relleno en celular */
+            font-size: 13px; /* Reducido de 14px */
             vertical-align: top;
         }
 
@@ -293,54 +311,74 @@
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
+            width: 100%;
         }
 
-        .receipt-label { font-weight: normal; padding-right: 4px; }
+        /* FORZAR UNA SOLA LÍNEA */
+        .receipt-label { 
+            font-weight: normal; 
+            padding-right: 4px; 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            max-width: 65%; /* Evita que el concepto empuje el precio */
+        }
         .receipt-dots {
             flex-grow: 1;
             border-bottom: 1.5px dotted #000;
             margin-bottom: 4px;
-            min-width: 15px;
+            min-width: 10px;
         }
-        .receipt-value { padding-left: 4px; font-weight: normal; white-space: nowrap; }
+        .receipt-value { 
+            padding-left: 4px; 
+            font-weight: normal; 
+            white-space: nowrap; 
+        }
 
         .receipt-total-bar {
-            font-size: 15px;
+            font-size: 13px; /* Reducido de 15px */
             font-weight: bold;
-            margin-top: 15px;
+            margin-top: 12px;
             text-align: left;
             display: flex;
             justify-content: space-between;
             border-bottom: 1px solid #000;
             padding-bottom: 5px;
         }
+        
+        .receipt-total-bar span {
+            white-space: nowrap; /* Evita que SALDO TOTAL salte a otra línea */
+        }
 
         .receipt-footer-msg {
-            margin-top: 30px;
+            margin-top: 25px;
             text-align: center;
-            font-size: 14px;
+            font-size: 13px;
             line-height: 1.4;
             white-space: pre-line;
         }
 
-        /* CLASE ESPECIAL PARA MODO TICKET ANGOSTO */
+        /* CLASE ESPECIAL PARA MODO TICKET ANGOSTO EXTREMO (300px) */
         .narrow-ticket .receipt-table-block th {
-            font-size: 11px;
+            font-size: 10.5px;
             padding: 4px 2px;
         }
         .narrow-ticket .receipt-table-block td {
-            padding: 6px 4px;
+            padding: 6px 2px;
         }
         .narrow-ticket .receipt-dots-row {
             font-size: 11.5px;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
         .narrow-ticket .receipt-client {
-            font-size: 13px;
+            font-size: 12px;
         }
         .narrow-ticket .receipt-title {
-            font-size: 18px;
+            font-size: 17px;
+        }
+        .narrow-ticket .receipt-total-bar {
+            font-size: 11.5px;
         }
 
         /* Historial y utilidades */
@@ -373,6 +411,10 @@
         <button class="nav-btn active" onclick="switchTab('nueva-factura')">📝 Facturar</button>
         <button class="nav-btn" onclick="switchTab('historial')">📊 Historial</button>
         <button class="nav-btn" onclick="switchTab('datos')">⚙️ Ajustes</button>
+    </div>
+
+    <div id="install-banner" onclick="instalarApp()">
+        📲 Toca aquí para INSTALAR la App en tu celular
     </div>
 
     <div id="nueva-factura" class="section-panel active">
@@ -769,7 +811,7 @@
                 items: conceptosArray,
                 total: total
             };
-
+ 
             db.facturas.unshift(nuevaFactura); 
             guardarEnLocalStorage();
 
@@ -1024,6 +1066,34 @@
         }
     </script>
     <script>
+        // LÓGICA DE INSTALACIÓN PWA
+        let eventoInstalacion;
+        
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Previene que Chrome muestre el aviso nativo miniatura
+            e.preventDefault();
+            // Guarda el evento para dispararlo cuando el usuario toque el botón
+            eventoInstalacion = e;
+            // Muestra nuestro banner azul personalizado
+            document.getElementById('install-banner').style.display = 'block';
+        });
+
+        function instalarApp() {
+            if (eventoInstalacion) {
+                // Muestra el prompt nativo grande de instalación
+                eventoInstalacion.prompt();
+                
+                // Espera a ver qué elige el usuario (Instalar o Cancelar)
+                eventoInstalacion.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        // Si acepta, ocultamos el botón
+                        document.getElementById('install-banner').style.display = 'none';
+                    }
+                    eventoInstalacion = null;
+                });
+            }
+        }
+
         // Registrar el Service Worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
