@@ -1,4 +1,4 @@
-const CACHE_NAME = 'conuco-pwa-v4';
+const CACHE_NAME = 'conuco-pwa-v6';
 const urlsToCache = [
   './',
   './index.html',
