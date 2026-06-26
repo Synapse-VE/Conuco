@@ -10,6 +10,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
+        /* ... (todo tu CSS se mantiene igual) ... */
         :root {
             --primary-color: #d32f2f;
             --primary-dark: #b71c1c;
@@ -749,6 +750,15 @@
             <div id="lista-clientes-tags"></div>
         </div>
 
+        <!-- NUEVO: Actualización de la App -->
+        <h2>Actualización de la App</h2>
+        <div class="card">
+            <button id="btn-actualizar-app" class="btn btn-primary" style="display:none;" onclick="forzarActualizacion()">
+                🔄 Instalar actualización pendiente
+            </button>
+            <p id="no-actualizacion-msg" style="font-size:13px; color:#888;">No hay actualizaciones pendientes.</p>
+        </div>
+
         <h2>Copia de Seguridad Portátil (Offline)</h2>
         <div class="card">
             <button class="btn btn-success" style="margin-bottom:10px;" onclick="exportarSistemaJSON()">📤 Descargar Respaldo (JSON)</button>
@@ -798,6 +808,7 @@
             applyPresetFooter('pendiente');
             toggleAbonosSection();
             updatePreview();
+            verificarActualizacionPendiente(); // NUEVO: restaurar botón si aplica
         });
 
         function migrarDB() {
@@ -1423,7 +1434,7 @@
                     const file = new File([blob],
                         `Recibo-${factura.cliente.replace(/[^a-zA-Z0-9]/g, "_")}.png`, { type: 'image/png' });
                     
-                    Swal.close(); // Cerrar el loading
+                    Swal.close();
 
                     if (navigator.canShare && navigator.canShare({ files: [file] })) {
                         navigator.share({
@@ -1670,6 +1681,9 @@
                     msgContainer.appendChild(d);
                 });
             }
+
+            // NUEVO: Mostrar/esconder botón de actualización según localStorage
+            verificarActualizacionPendiente();
         }
 
         function eliminarCliente(nombre) {
@@ -1677,6 +1691,30 @@
             guardarEnLocalStorage();
             actualizarDatalistClientes();
             renderAjustes();
+        }
+
+        // NUEVO: Verificar si hay actualización pendiente y mostrar/ocultar botón
+        function verificarActualizacionPendiente() {
+            const btnActualizar = document.getElementById('btn-actualizar-app');
+            const noMsg = document.getElementById('no-actualizacion-msg');
+            if (localStorage.getItem('actualizacion_pendiente') === 'true') {
+                btnActualizar.style.display = 'block';
+                if (noMsg) noMsg.style.display = 'none';
+            } else {
+                btnActualizar.style.display = 'none';
+                if (noMsg) noMsg.style.display = 'block';
+            }
+        }
+
+        // NUEVO: Forzar la actualización desde el botón de ajustes
+        function forzarActualizacion() {
+            navigator.serviceWorker.getRegistration().then(reg => {
+                if (reg && reg.waiting) {
+                    reg.waiting.postMessage('skipWaiting');
+                }
+                localStorage.removeItem('actualizacion_pendiente');
+                window.location.reload();
+            });
         }
 
         function exportarSistemaJSON() {
@@ -1785,11 +1823,52 @@
                 });
             }
         }
+
+        // NUEVO: Registro del SW con detección de actualización y SweetAlert2
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('Service Worker registrado correctamente.', reg.scope))
-                    .catch(err => console.log('Error al registrar Service Worker.', err));
+                navigator.serviceWorker.register('./sw.js').then(registration => {
+                    // Verificar si hay una actualización en espera que no se haya notificado
+                    if (registration.waiting) {
+                        mostrarAlertaActualizacion(registration.waiting);
+                    }
+
+                    registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                // Hay una nueva versión lista para usar
+                                mostrarAlertaActualizacion(newWorker);
+                            }
+                        });
+                    });
+                }).catch(err => {
+                    console.log('Error al registrar Service Worker.', err);
+                });
+
+                // Recargar si el SW toma el control sin preguntar (por si se activa solo)
+                navigator.serviceWorker.addEventListener('controllerchange', () => {
+                    window.location.reload();
+                });
+            });
+        }
+
+        function mostrarAlertaActualizacion(worker) {
+            Swal.fire({
+                title: 'Actualización disponible',
+                text: 'Hay una nueva versión de la app. ¿Quieres aplicarla ahora?',
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonText: 'Aplicar',
+                cancelButtonText: 'Más tarde'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    worker.postMessage('skipWaiting');
+                } else {
+                    // Guardar el flag para que el botón en ajustes se active
+                    localStorage.setItem('actualizacion_pendiente', 'true');
+                    verificarActualizacionPendiente();
+                }
             });
         }
     </script>

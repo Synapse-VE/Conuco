@@ -17,6 +17,8 @@ self.addEventListener('install', event => {
         return cache.addAll(urlsToCache);
       })
   );
+  // Forzar la activación inmediata del nuevo SW
+  self.skipWaiting();
 });
 
 // Interceptar peticiones y servir desde caché si no hay red
@@ -44,4 +46,13 @@ self.addEventListener('activate', event => {
       );
     })
   );
+  // Tomar control de todas las pestañas abiertas
+  event.waitUntil(clients.claim());
+});
+
+// Escuchar mensajes para forzar la actualización desde la app
+self.addEventListener('message', event => {
+  if (event.data === 'skipWaiting') {
+    self.skipWaiting();
+  }
 });
