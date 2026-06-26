@@ -1,8 +1,9 @@
-const CACHE_NAME = 'conuco-pwa-v3';
+const CACHE_NAME = 'conuco-pwa-v4';
 const urlsToCache = [
   './',
   './index.html',
   'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js',
+  'https://cdn.jsdelivr.net/npm/sweetalert2@11',
   './icon-192.png',
   './icon-512.png',
   './manifest.json'

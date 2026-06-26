@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Facturador Conuco Offline</title>
+    <title>Facturador Conuco</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#d32f2f">
     <link rel="apple-touch-icon" href="icon-192.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         :root {
             --primary-color: #d32f2f;
@@ -34,7 +35,6 @@
             font-size: 16px;
         }
 
-        /* Barra de Navegación Móvil Superior */
         .navbar {
             background-color: #1a1a1a;
             color: white;
@@ -43,7 +43,7 @@
             position: sticky;
             top: 0;
             z-index: 1000;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
 
         .nav-btn {
@@ -63,10 +63,9 @@
         .nav-btn.active {
             color: white;
             border-bottom: 3px solid var(--primary-color);
-            background-color: rgba(255,255,255,0.05);
+            background-color: rgba(255, 255, 255, 0.05);
         }
 
-        /* BANNER DE INSTALACIÓN PWA */
         #install-banner {
             display: none;
             background-color: #1976D2;
@@ -76,13 +75,12 @@
             font-weight: bold;
             font-size: 15px;
             cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
         #install-banner:active {
             background-color: #1565C0;
         }
 
-        /* Contenedores de Sección */
         .section-panel {
             display: none;
             padding: 15px;
@@ -102,13 +100,12 @@
             padding-left: 8px;
         }
 
-        /* Tarjetas de Formulario */
         .card {
             background: var(--card-bg);
             border-radius: 8px;
             padding: 16px;
             margin-bottom: 15px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         .form-group {
@@ -123,10 +120,12 @@
             color: #555;
         }
 
-        .form-control, select, textarea {
+        .form-control,
+        select,
+        textarea {
             width: 100%;
             padding: 12px;
-            font-size: 16px; 
+            font-size: 16px;
             border: 1px solid var(--border-color);
             border-radius: 6px;
             background-color: #fafafa;
@@ -135,7 +134,6 @@
             transition: border-color 0.2s;
         }
 
-        /* Deslizador de tamaño */
         input[type="range"] {
             padding: 0;
             height: 6px;
@@ -153,10 +151,12 @@
             border-radius: 50%;
             background: var(--primary-color);
             cursor: pointer;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
         }
 
-        .form-control:focus, select:focus, textarea:focus {
+        .form-control:focus,
+        select:focus,
+        textarea:focus {
             border-color: var(--primary-color);
             background-color: #fff;
         }
@@ -167,10 +167,13 @@
             align-items: flex-end;
         }
 
-        .flex-1 { flex: 1; }
-        .flex-2 { flex: 2; }
+        .flex-1 {
+            flex: 1;
+        }
+        .flex-2 {
+            flex: 2;
+        }
 
-        /* Botones del Sistema */
         .btn {
             display: inline-flex;
             align-items: center;
@@ -190,33 +193,46 @@
             transform: scale(0.98);
         }
 
-        .btn-primary { background-color: var(--primary-color); color: white; }
-        .btn-primary:hover { background-color: var(--primary-dark); }
-        .btn-success { background-color: var(--accent-color); color: white; }
-        .btn-secondary { background-color: #607d8b; color: white; }
-        .btn-danger { background-color: #e53935; color: white; }
-        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+        .btn-success {
+            background-color: var(--accent-color);
+            color: white;
+        }
+        .btn-secondary {
+            background-color: #607d8b;
+            color: white;
+        }
+        .btn-danger {
+            background-color: #e53935;
+            color: white;
+        }
+
         .btn-sm {
             padding: 8px 12px;
             font-size: 13px;
             width: auto;
         }
 
-        /* DISEÑO DE LA FACTURA ADAPTABLE */
         .receipt-container-box {
             background-color: #e0e0e0;
             padding: 10px;
             border-radius: 8px;
-            overflow-x: auto; 
+            overflow-x: auto;
             margin-top: 15px;
-            text-align: center; 
+            text-align: center;
         }
 
         .receipt-preview {
             background-color: #ffffff;
-            margin: 0 auto; 
+            margin: 0 auto;
             padding: 25px 20px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
             font-family: 'Arial', sans-serif;
             color: #000000;
             position: relative;
@@ -255,8 +271,14 @@
             gap: 10px;
             justify-content: center;
         }
-        .receipt-logo-text::before { content: '🐓'; font-size: 24px; }
-        .receipt-logo-text::after { content: '🌽'; font-size: 24px; }
+        .receipt-logo-text::before {
+            content: '🐓';
+            font-size: 24px;
+        }
+        .receipt-logo-text::after {
+            content: '🌽';
+            font-size: 24px;
+        }
 
         .receipt-title {
             font-size: 22px;
@@ -278,10 +300,15 @@
             font-weight: bold;
             line-height: 1.4;
         }
-        .receipt-client span { font-weight: normal; }
-        .receipt-date-sub { font-size: 13px; font-weight: normal; color: #333; }
+        .receipt-client span {
+            font-weight: normal;
+        }
+        .receipt-date-sub {
+            font-size: 13px;
+            font-weight: normal;
+            color: #333;
+        }
 
-        /* Tabla de detalles estilo ticket (AJUSTADO PARA NO BAJAR NUNCA) */
         .receipt-table-block {
             border: 1.5px solid #000000;
             width: 100%;
@@ -301,43 +328,43 @@
 
         .receipt-table-block td {
             padding: 8px 4px;
-            font-size: 13px; 
+            font-size: 13px;
             vertical-align: top;
         }
 
         .receipt-dots-row {
             display: flex;
             justify-content: space-between;
-            align-items: center; /* Centrado vertical */
+            align-items: center;
             margin-bottom: 6px;
             width: 100%;
-            overflow: hidden; /* Seguridad extra */
+            overflow: hidden;
         }
 
-        .receipt-label { 
-            font-weight: normal; 
-            padding-right: 4px; 
-            white-space: nowrap; 
-            overflow: hidden; 
-            text-overflow: ellipsis; 
-            flex-shrink: 1; /* Permite encoger este texto si es muy largo */
+        .receipt-label {
+            font-weight: normal;
+            padding-right: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex-shrink: 1;
         }
         .receipt-dots {
             flex-grow: 1;
             border-bottom: 1.5px dotted #000;
             margin-bottom: 4px;
             min-width: 10px;
-            flex-shrink: 0; /* Impide que los puntos desaparezcan */
+            flex-shrink: 0;
         }
-        .receipt-value { 
-            padding-left: 4px; 
-            font-weight: normal; 
-            white-space: nowrap; 
-            flex-shrink: 0; /* JAMÁS encoger el precio */
+        .receipt-value {
+            padding-left: 4px;
+            font-weight: normal;
+            white-space: nowrap;
+            flex-shrink: 0;
         }
 
         .receipt-total-bar {
-            font-size: 12px; 
+            font-size: 12px;
             font-weight: bold;
             margin-top: 12px;
             text-align: left;
@@ -349,7 +376,7 @@
             width: 100%;
             overflow: hidden;
         }
-        
+
         #preview-total-label {
             white-space: nowrap;
             overflow: hidden;
@@ -357,7 +384,7 @@
             flex-shrink: 1;
             padding-right: 5px;
         }
-        
+
         #preview-total-val {
             white-space: nowrap;
             flex-shrink: 0;
@@ -371,7 +398,6 @@
             white-space: pre-line;
         }
 
-        /* CLASE ESPECIAL PARA MODO TICKET ANGOSTO EXTREMO (300px) */
         .narrow-ticket .receipt-table-block th {
             font-size: 10px;
             padding: 4px 2px;
@@ -393,28 +419,142 @@
             font-size: 10.5px;
         }
 
-        /* Historial y utilidades */
         .history-item {
             background: white;
             padding: 12px;
             border-radius: 6px;
             margin-bottom: 10px;
             border-left: 4px solid var(--primary-color);
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
         }
-        .history-item.status-cancelado { border-left-color: var(--accent-color); }
-        .history-item.status-abono { border-left-color: #ff9800; }
-        .history-item.status-presupuesto { border-left-color: #00bcd4; }
-        .history-meta { display: flex; justify-content: space-between; font-size: 12px; color: #666; margin-bottom: 5px; }
-        .history-title { font-weight: bold; font-size: 15px; margin-bottom: 3px; }
-        .mt-10 { margin-top: 10px; }
-        .badge { padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: bold; color: white; text-transform: uppercase; }
-        .bg-pendiente { background-color: var(--primary-color); }
-        .bg-cancelado { background-color: var(--accent-color); }
-        .bg-abono { background-color: #ff9800; }
-        .bg-presupuesto { background-color: #00bcd4; }
-        .client-tag { display: inline-flex; align-items: center; background: #e0e0e0; padding: 5px 10px; border-radius: 20px; margin: 4px; font-size: 14px; }
-        .client-tag remove { margin-left: 8px; color: #c62828; font-weight: bold; cursor: pointer; }
+        .history-item.status-cancelado {
+            border-left-color: var(--accent-color);
+        }
+        .history-item.status-abono {
+            border-left-color: #ff9800;
+        }
+        .history-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .history-title {
+            font-weight: bold;
+            font-size: 15px;
+            margin-bottom: 3px;
+        }
+        .mt-10 {
+            margin-top: 10px;
+        }
+        .badge {
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: bold;
+            color: white;
+            text-transform: uppercase;
+        }
+        .bg-pendiente {
+            background-color: var(--primary-color);
+        }
+        .bg-cancelado {
+            background-color: var(--accent-color);
+        }
+        .bg-abono {
+            background-color: #ff9800;
+        }
+
+        .client-tag {
+            display: inline-flex;
+            align-items: center;
+            background: #e0e0e0;
+            padding: 5px 10px;
+            border-radius: 20px;
+            margin: 4px;
+            font-size: 14px;
+        }
+        .client-tag remove {
+            margin-left: 8px;
+            color: #c62828;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* MODAL */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-box {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            width: 90%;
+            max-width: 350px;
+            text-align: center;
+        }
+        .modal-box h3 {
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+        .modal-box .btn {
+            margin-bottom: 10px;
+        }
+
+        /* TABS HISTORIAL */
+        .tabs-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+        .tab-btn {
+            background: #e0e0e0;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+        .tab-btn.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* SELECT MENSAJES */
+        .footer-message-row {
+            display: flex;
+            gap: 5px;
+            align-items: flex-start;
+            margin-top: 10px;
+        }
+        .footer-message-row select {
+            width: auto;
+            flex: 1;
+            padding: 8px;
+            font-size: 13px;
+        }
+        .footer-message-row .btn {
+            width: auto;
+            padding: 8px 10px;
+            font-size: 13px;
+        }
     </style>
 </head>
 <body>
@@ -429,24 +569,28 @@
         📲 Toca aquí para INSTALAR la App en tu celular
     </div>
 
+    <div class="modal-overlay" id="modal-guardar">
+        <div class="modal-box">
+            <h3>💾 Guardar Recibo</h3>
+            <button class="btn btn-primary" onclick="confirmarGuardar('solo')">📁 Guardar solo en historial</button>
+            <button class="btn btn-success" onclick="confirmarGuardar('compartir')">📤 Guardar y compartir</button>
+            <button class="btn btn-secondary" onclick="cerrarModalGuardar()">Cancelar</button>
+        </div>
+    </div>
+
     <div id="nueva-factura" class="section-panel active">
         <h2>Generar Recibo Dinámico</h2>
-        
+
         <div class="card">
             <div class="form-group">
                 <label for="factura-categoria">Categoría / Estado:</label>
-                <select id="factura-categoria" onchange="updatePreview()">
-                    <option value="pendiente">Cuenta Pendiente</option>
-                    <option value="cancelado">Cuenta Cancelada</option>
-                    <option value="abono">Abono Realizado</option>
-                    <option value="presupuesto">Presupuesto / Cotización</option>
+                <select id="factura-categoria" onchange="updatePreview(); toggleAbonosSection();">
                 </select>
             </div>
 
             <div class="form-group">
                 <label for="factura-logo">Seleccionar Logo:</label>
                 <select id="factura-logo" onchange="updatePreview()">
-                    <option value="default">Logo Conuco Predeterminado</option>
                 </select>
             </div>
 
@@ -497,6 +641,12 @@
             <button class="btn btn-secondary btn-sm mt-10" onclick="addItemRow()">➕ Agregar Concepto</button>
         </div>
 
+        <div class="card" id="abonos-section" style="display:none;">
+            <label style="display:block; font-size:14px; font-weight:600; margin-bottom:8px; color:#555;">Agregar Abono:</label>
+            <div id="abonos-container"></div>
+            <button class="btn btn-secondary btn-sm mt-10" onclick="addAbonoRow()">➕ Agregar Abono</button>
+        </div>
+
         <div class="card">
             <div class="form-group">
                 <label for="factura-footer">Mensaje al Final:</label>
@@ -505,27 +655,30 @@
             <div class="row-flex">
                 <button class="btn btn-secondary btn-sm" onclick="applyPresetFooter('pendiente')">Set Pendiente</button>
                 <button class="btn btn-secondary btn-sm" onclick="applyPresetFooter('cancelado')">Set Cancelado</button>
+                <button class="btn btn-secondary btn-sm" onclick="applyPresetFooter('nuevo')">Set Nuevo</button>
+            </div>
+            <div class="footer-message-row" id="footer-msg-selector">
+                <select id="select-mensajes-guardados" class="form-control" onchange="cargarMensajeGuardado()">
+                    <option value="">📋 Mensajes guardados...</option>
+                </select>
             </div>
         </div>
 
-        <button class="btn btn-primary" onclick="guardarYCompartirFactura()">📦 Guardar Historial y Compartir Recibo</button>
+        <button class="btn btn-primary" onclick="abrirModalGuardar()">📦 Guardar Recibo</button>
 
         <h2 class="mt-10">Vista Previa (Diseño Final)</h2>
         <div class="receipt-container-box">
             <div id="recibo-preview" class="receipt-preview">
-                
                 <div class="receipt-header">
                     <div class="receipt-logo-area" id="preview-logo-container">
                         <div class="receipt-logo-text">CONUCO</div>
                     </div>
                     <div class="receipt-title" id="preview-title">CUENTA PENDIENTE</div>
                 </div>
-
                 <div class="receipt-client">
                     CLIENTE: <span id="preview-cliente">Heidi Durán</span><br>
                     <span class="receipt-date-sub">FECHA: <span id="preview-fecha">16/06/2026 05:26 PM</span></span>
                 </div>
-
                 <table class="receipt-table-block">
                     <thead>
                         <tr>
@@ -535,18 +688,17 @@
                     <tbody>
                         <tr>
                             <td id="preview-items-td">
-                                <div id="preview-dynamic-items">
-                                </div>
+                                <div id="preview-dynamic-items"></div>
                             </td>
                         </tr>
                     </tbody>
                 </table>
-
-                <div class="receipt-total-bar">
-                    <span id="preview-total-label">SALDO TOTAL PENDIENTE:</span>
-                    <span id="preview-total-val">COP$ 0</span>
+                <div id="preview-totals-container">
+                    <div class="receipt-total-bar">
+                        <span id="preview-total-label">SALDO TOTAL PENDIENTE:</span>
+                        <span id="preview-total-val">COP$ 0</span>
+                    </div>
                 </div>
-
                 <div class="receipt-footer-msg" id="preview-footer"></div>
             </div>
         </div>
@@ -559,6 +711,7 @@
                 <input type="text" id="search-historial" class="form-control" placeholder="🔍 Buscar por cliente o concepto..." oninput="renderHistorial()">
             </div>
         </div>
+        <div class="tabs-container" id="historial-tabs"></div>
         <div id="historial-lista"></div>
     </div>
 
@@ -568,9 +721,27 @@
             <div class="form-group">
                 <label>Subir nuevo Logo desde el Celular:</label>
                 <input type="file" id="upload-logo" class="form-control" accept="image/*" onchange="processLogoUpload(event)">
+                <div style="margin-top:8px; display:flex; align-items:center; gap:5px;">
+                    <input type="checkbox" id="marcar-predeterminado-logo">
+                    <label for="marcar-predeterminado-logo" style="font-size:14px; margin:0;">Marcar como logo predeterminado</label>
+                </div>
                 <p style="font-size:12px; color:#666; margin-top:5px;">El logo se guardará en la memoria interna de la app para usarlo cuando quieras.</p>
             </div>
             <div id="lista-logos-guardados" style="margin-top:10px;"></div>
+        </div>
+
+        <h2>Gestión de Categorías / Estados</h2>
+        <div class="card">
+            <div class="row-flex" style="align-items:center;">
+                <input type="text" id="nueva-categoria-input" class="form-control flex-1" placeholder="Nombre nueva categoría">
+                <button class="btn btn-success btn-sm" style="width:auto;" onclick="agregarCategoria()">➕ Agregar</button>
+            </div>
+            <div id="lista-categorias-tags" style="margin-top:10px;"></div>
+        </div>
+
+        <h2>Mensajes Finales Guardados</h2>
+        <div class="card">
+            <div id="lista-mensajes-personalizados"></div>
         </div>
 
         <h2>Gestión de Clientes Registrados</h2>
@@ -584,43 +755,71 @@
             <label style="display:block; font-size:14px; font-weight:600; margin-bottom:5px; color:#555;">Importar Respaldo:</label>
             <input type="file" id="import-json-file" class="form-control" accept=".json" onchange="importarSistemaJSON(event)">
         </div>
-        
+
         <button class="btn btn-danger" onclick="limpiarTodoElSistema()">⚠️ Borrar Absolutamente Todo</button>
     </div>
 
     <script>
+        // CATEGORÍAS PROTEGIDAS (no se pueden borrar)
+        const CATEGORIAS_PROTEGIDAS = ['pendiente', 'cancelado', 'abono'];
+
         // BASE DE DATOS LOCAL
         let db = {
             clientes: ["Heidi Durán (Carnicería)", "Juan Pérez", "Abasto Los Llanos"],
             logos: [],
             facturas: [],
+            categorias: ["pendiente", "cancelado", "abono"],
+            mensajesPersonalizados: [],
             config: {
                 logoSize: 200,
-                receiptWidth: 420
+                receiptWidth: 420,
+                logoSeleccionado: null
             }
+        };
+
+        let facturaEditandoId = null;
+        let abonosPreviosFactura = [];
+
+        // TEXTOS PREDETERMINADOS ORIGINALES (inmutables)
+        const TEXTOS_PREDETERMINADOS = {
+            pendiente: "Muchísimas gracias por su compra y preferencia!\nEsperamos su pronto pago.",
+            cancelado: "Muchísimas gracias por su compra y preferencia!\nCuenta totalmente procesada con éxito."
         };
 
         window.addEventListener('DOMContentLoaded', () => {
             cargarDeLocalStorage();
             setFechaActual();
-            
             if (db.facturas.length === 0) {
                 document.getElementById('factura-cliente').value = "Heidi Durán (Carnicería)";
                 addItemRow("12 pollos (29 kg 650 g total)", 355800);
             } else {
                 addItemRow("", "");
             }
-
             applyPresetFooter('pendiente');
+            toggleAbonosSection();
             updatePreview();
         });
+
+        function migrarDB() {
+            if (!db.categorias) db.categorias = ["pendiente", "cancelado", "abono"];
+            CATEGORIAS_PROTEGIDAS.forEach(cat => {
+                if (!db.categorias.includes(cat)) db.categorias.push(cat);
+            });
+            if (!db.mensajesPersonalizados) db.mensajesPersonalizados = [];
+            if (!db.config) db.config = { logoSize: 200, receiptWidth: 420, logoSeleccionado: null };
+            if (db.config.logoSeleccionado === undefined) db.config.logoSeleccionado = null;
+            db.logos.forEach(l => { if (l.predeterminado === undefined) l.predeterminado = false; });
+            db.facturas.forEach(f => {
+                if (!f.abonos) f.abonos = [];
+            });
+            guardarEnLocalStorage();
+        }
 
         function switchTab(tabId) {
             document.querySelectorAll('.section-panel').forEach(panel => panel.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
             event.currentTarget.classList.add('active');
-
             if (tabId === 'historial') renderHistorial();
             if (tabId === 'datos') renderAjustes();
         }
@@ -638,14 +837,14 @@
             div.className = 'row-flex mt-10';
             div.id = rowId;
             div.innerHTML = `
-                <div class="flex-2">
-                    <input type="text" class="form-control item-concepto" placeholder="Ej. 12 pollos (29 kg)" value="${concepto}" oninput="updatePreview()">
-                </div>
-                <div class="flex-1">
-                    <input type="number" class="form-control item-monto" placeholder="Monto $" value="${monto}" oninput="updatePreview()" inputmode="numeric">
-                </div>
-                <button class="btn btn-danger btn-sm" style="width:auto; height:45px;" onclick="removeItemRow('${rowId}')">❌</button>
-            `;
+            <div class="flex-2">
+              <input type="text" class="form-control item-concepto" placeholder="Ej. 12 pollos (29 kg)" value="${concepto}" oninput="updatePreview()">
+            </div>
+            <div class="flex-1">
+              <input type="number" class="form-control item-monto" placeholder="Monto $" value="${monto}" oninput="updatePreview()" inputmode="numeric">
+            </div>
+            <button class="btn btn-danger btn-sm" style="width:auto; height:45px;" onclick="removeItemRow('${rowId}')">❌</button>
+          `;
             container.appendChild(div);
             updatePreview();
         }
@@ -656,68 +855,95 @@
             updatePreview();
         }
 
+        function addAbonoRow(fecha = "", monto = "") {
+            const container = document.getElementById('abonos-container');
+            const rowId = 'abono-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4);
+            if (!fecha) {
+                const hoy = new Date();
+                fecha = hoy.toISOString().slice(0, 10);
+            }
+            const div = document.createElement('div');
+            div.className = 'row-flex mt-10';
+            div.id = rowId;
+            div.innerHTML = `
+            <div class="flex-1">
+              <input type="date" class="form-control abono-fecha" value="${fecha}" onchange="updatePreview()">
+            </div>
+            <div class="flex-1">
+              <input type="number" class="form-control abono-monto" placeholder="Monto $" value="${monto}" oninput="updatePreview()" inputmode="numeric">
+            </div>
+            <button class="btn btn-danger btn-sm" style="width:auto; height:45px;" onclick="removeAbonoRow('${rowId}')">❌</button>
+          `;
+            container.appendChild(div);
+            updatePreview();
+        }
+
+        function removeAbonoRow(id) {
+            const row = document.getElementById(id);
+            if (row) row.remove();
+            updatePreview();
+        }
+
+        function toggleAbonosSection() {
+            const categoria = document.getElementById('factura-categoria').value;
+            const section = document.getElementById('abonos-section');
+            section.style.display = (categoria === 'abono') ? 'block' : 'none';
+            updatePreview();
+        }
+
+        function obtenerTextosCategoria(categoria) {
+            const mapeo = {
+                pendiente: { titulo: "CUENTA PENDIENTE", header: "DETALLE DE LA CUENTA PENDIENTE (COP)", total: "SALDO TOTAL PENDIENTE:" },
+                cancelado: { titulo: "CUENTA CANCELADA", header: "DETALLE DE LA CUENTA CANCELADA (COP)", total: "TOTAL CANCELADO:" },
+                abono: { titulo: "ABONO REALIZADO", header: "DETALLE DEL ABONO / ENTREGA (COP)", total: "TOTAL ABONADO:" },
+            };
+            if (mapeo[categoria]) return mapeo[categoria];
+            const nombreMayus = categoria.toUpperCase();
+            return {
+                titulo: nombreMayus,
+                header: `DETALLE DE ${nombreMayus} (COP)`,
+                total: `TOTAL ${nombreMayus}:`
+            };
+        }
+
         function updatePreview() {
             const categoria = document.getElementById('factura-categoria').value;
             const cliente = document.getElementById('factura-cliente').value || "Cliente General";
             const fechaVal = document.getElementById('factura-fecha').value;
             const footerText = document.getElementById('factura-footer').value;
             const logoSel = document.getElementById('factura-logo').value;
-            
-            // Medidas de diseño y actualización del contador visual
+
             const logoSizeVal = document.getElementById('factura-logo-size').value;
             document.getElementById('logo-size-display').innerText = logoSizeVal + 'px';
             const widthVal = document.getElementById('factura-ancho').value;
 
-            // Ajustar ancho del recibo (FORZADO CON MAX Y MIN PARA MÓVIL)
             const previewContainer = document.getElementById('recibo-preview');
             previewContainer.style.width = widthVal + 'px';
             previewContainer.style.minWidth = widthVal + 'px';
             previewContainer.style.maxWidth = widthVal + 'px';
-            
             if (widthVal === "300") {
                 previewContainer.classList.add('narrow-ticket');
             } else {
                 previewContainer.classList.remove('narrow-ticket');
             }
 
-            const previewTitle = document.getElementById('preview-title');
-            const previewTableHeader = document.getElementById('preview-table-header');
-            const previewTotalLabel = document.getElementById('preview-total-label');
+            const textos = obtenerTextosCategoria(categoria);
+            document.getElementById('preview-title').innerText = textos.titulo;
+            document.getElementById('preview-table-header').innerText = textos.header;
 
-            if (categoria === 'pendiente') {
-                previewTitle.innerText = "CUENTA PENDIENTE";
-                previewTableHeader.innerText = "DETALLE DE LA CUENTA PENDIENTE (COP)";
-                previewTotalLabel.innerText = "SALDO TOTAL PENDIENTE:";
-            } else if (categoria === 'cancelado') {
-                previewTitle.innerText = "CUENTA CANCELADA";
-                previewTableHeader.innerText = "DETALLE DE LA CUENTA CANCELADA (COP)";
-                previewTotalLabel.innerText = "TOTAL CANCELADO:";
-            } else if (categoria === 'abono') {
-                previewTitle.innerText = "ABONO REALIZADO";
-                previewTableHeader.innerText = "DETALLE DEL ABONO / ENTREGA (COP)";
-                previewTotalLabel.innerText = "TOTAL ABONADO:";
-            } else if (categoria === 'presupuesto') {
-                previewTitle.innerText = "PRESUPUESTO";
-                previewTableHeader.innerText = "DETALLE DE COTIZACIÓN (COP)";
-                previewTotalLabel.innerText = "TOTAL ESTIMADO:";
-            }
-
-            // Cargar Logo Seleccionado con el Tamaño Ajustado
             const logoContainer = document.getElementById('preview-logo-container');
-            if (logoSel === 'default') {
-                logoContainer.innerHTML = `<div class="receipt-logo-text">CONUCO</div>`;
-            } else {
+            if (logoSel && logoSel !== 'none') {
                 const foundLogo = db.logos.find(l => l.id === logoSel);
                 if (foundLogo) {
                     logoContainer.innerHTML = `<img src="${foundLogo.base64}" class="receipt-logo-img" style="max-width: ${logoSizeVal}px;" alt="Logo">`;
                 } else {
                     logoContainer.innerHTML = `<div class="receipt-logo-text">CONUCO</div>`;
                 }
+            } else {
+                logoContainer.innerHTML = `<div class="receipt-logo-text">CONUCO</div>`;
             }
 
-            // Cliente y Fecha
             document.getElementById('preview-cliente').innerText = cliente;
-            
             if (fechaVal) {
                 const f = new Date(fechaVal);
                 const dia = String(f.getDate()).padStart(2, '0');
@@ -727,59 +953,131 @@
                 const minutos = String(f.getMinutes()).padStart(2, '0');
                 const ampm = horas >= 12 ? 'PM' : 'AM';
                 horas = horas % 12;
-                horas = horas ? horas : 12; 
+                horas = horas ? horas : 12;
                 document.getElementById('preview-fecha').innerText = `${dia}/${mes}/${anio} ${String(horas).padStart(2, '0')}:${minutos} ${ampm}`;
             }
 
-            // Inyectar Ítems
             const dynamicContainer = document.getElementById('preview-dynamic-items');
             dynamicContainer.innerHTML = "";
-            let totalAcumulado = 0;
+            let totalOriginal = 0;
+
             const conceptosInputs = document.querySelectorAll('.item-concepto');
             const montosInputs = document.querySelectorAll('.item-monto');
-
             conceptosInputs.forEach((input, index) => {
                 const conceptoText = input.value || "Concepto general";
                 const montoVal = parseFloat(montosInputs[index].value) || 0;
-                totalAcumulado += montoVal;
-
+                totalOriginal += montoVal;
                 const rowDiv = document.createElement('div');
                 rowDiv.className = 'receipt-dots-row';
-                rowDiv.innerHTML = `
-                    <span class="receipt-label">${conceptoText}</span>
-                    <span class="receipt-dots"></span>
-                    <span class="receipt-value">COP$ ${formatearMoneda(montoVal)}</span>
-                `;
+                rowDiv.innerHTML = `<span class="receipt-label">${conceptoText}</span><span class="receipt-dots"></span><span class="receipt-value">COP$ ${formatearMoneda(montoVal)}</span>`;
                 dynamicContainer.appendChild(rowDiv);
             });
 
-            document.getElementById('preview-total-val').innerText = "COP$ " + formatearMoneda(totalAcumulado);
+            let totalAbonadoPrevio = 0;
+            if (abonosPreviosFactura.length > 0) {
+                abonosPreviosFactura.forEach(ab => {
+                    totalAbonadoPrevio += ab.monto;
+                    const rowDiv = document.createElement('div');
+                    rowDiv.className = 'receipt-dots-row';
+                    rowDiv.innerHTML = `<span class="receipt-label">Abono (${formatearFecha(ab.fecha)})</span><span class="receipt-dots"></span><span class="receipt-value">COP$ ${formatearMoneda(ab.monto)}</span>`;
+                    dynamicContainer.appendChild(rowDiv);
+                });
+            }
+
+            let totalAbonadoNuevo = 0;
+            if (categoria === 'abono') {
+                const abonoMontos = document.querySelectorAll('.abono-monto');
+                if (abonoMontos.length > 0) {
+                    totalAbonadoNuevo = parseFloat(abonoMontos[0].value) || 0;
+                }
+            }
+
+            const totalAbonadoTotal = totalAbonadoPrevio + totalAbonadoNuevo;
+            const saldo = totalOriginal - totalAbonadoTotal;
+
+            const totalsContainer = document.getElementById('preview-totals-container');
+            totalsContainer.innerHTML = '';
+
+            if (categoria === 'abono' && totalAbonadoNuevo > 0) {
+                const barraHoy = document.createElement('div');
+                barraHoy.className = 'receipt-total-bar';
+                barraHoy.innerHTML = `<span>ABONO HOY:</span><span>COP$ ${formatearMoneda(totalAbonadoNuevo)}</span>`;
+                totalsContainer.appendChild(barraHoy);
+
+                if (saldo <= 0) {
+                    document.getElementById('preview-title').innerText = "CUENTA CANCELADA";
+                    document.getElementById('preview-table-header').innerText = "DETALLE DE LA CUENTA CANCELADA (COP)";
+                    const barraCancelado = document.createElement('div');
+                    barraCancelado.className = 'receipt-total-bar';
+                    barraCancelado.innerHTML = `<span>TOTAL CANCELADO:</span><span>COP$ ${formatearMoneda(totalOriginal)}</span>`;
+                    totalsContainer.appendChild(barraCancelado);
+                } else {
+                    const barraSaldo = document.createElement('div');
+                    barraSaldo.className = 'receipt-total-bar';
+                    barraSaldo.innerHTML = `<span>SALDO PENDIENTE:</span><span>COP$ ${formatearMoneda(saldo)}</span>`;
+                    totalsContainer.appendChild(barraSaldo);
+                }
+            } else if (abonosPreviosFactura.length > 0 && totalAbonadoNuevo === 0) {
+                if (saldo <= 0) {
+                    document.getElementById('preview-title').innerText = "CUENTA CANCELADA";
+                    document.getElementById('preview-table-header').innerText = "DETALLE DE LA CUENTA CANCELADA (COP)";
+                    const barraCancelado = document.createElement('div');
+                    barraCancelado.className = 'receipt-total-bar';
+                    barraCancelado.innerHTML = `<span>TOTAL CANCELADO:</span><span>COP$ ${formatearMoneda(totalOriginal)}</span>`;
+                    totalsContainer.appendChild(barraCancelado);
+                } else {
+                    const barraNormal = document.createElement('div');
+                    barraNormal.className = 'receipt-total-bar';
+                    barraNormal.innerHTML = `<span>SALDO PENDIENTE:</span><span>COP$ ${formatearMoneda(saldo)}</span>`;
+                    totalsContainer.appendChild(barraNormal);
+                }
+            } else {
+                const barraNormal = document.createElement('div');
+                barraNormal.className = 'receipt-total-bar';
+                barraNormal.innerHTML = `<span>${textos.total}</span><span>COP$ ${formatearMoneda(totalOriginal)}</span>`;
+                totalsContainer.appendChild(barraNormal);
+            }
+
             document.getElementById('preview-footer').innerText = footerText;
         }
 
+        function formatearFecha(fechaISO) {
+            if (!fechaISO) return '';
+            const partes = fechaISO.split('-');
+            if (partes.length === 3) {
+                return partes[2] + '/' + partes[1] + '/' + partes[0];
+            }
+            return fechaISO;
+        }
+
         function formatearMoneda(valor) {
-            return new Intl.NumberFormat('de-DE').format(valor); 
+            return new Intl.NumberFormat('de-DE').format(valor);
         }
 
         function applyPresetFooter(tipo) {
             if (tipo === 'pendiente') {
-                document.getElementById('factura-footer').value = "Muchísimas gracias por su compra y preferencia!\nEsperamos su pronto pago.";
-            } else {
-                document.getElementById('factura-footer').value = "Muchísimas gracias por su compra y preferencia!\nCuenta totalmente procesada con éxito.";
+                document.getElementById('factura-footer').value = TEXTOS_PREDETERMINADOS.pendiente;
+            } else if (tipo === 'cancelado') {
+                document.getElementById('factura-footer').value = TEXTOS_PREDETERMINADOS.cancelado;
+            } else if (tipo === 'nuevo') {
+                document.getElementById('factura-footer').value = '';
             }
             updatePreview();
         }
 
         function saveQuickClient() {
             const nombre = document.getElementById('factura-cliente').value.trim();
-            if (!nombre) return alert("Escribe un nombre de cliente válido.");
+            if (!nombre) {
+                Swal.fire('Atención', 'Escribe un nombre de cliente válido.', 'warning');
+                return;
+            }
             if (!db.clientes.includes(nombre)) {
                 db.clientes.push(nombre);
                 guardarEnLocalStorage();
                 actualizarDatalistClientes();
-                alert("Cliente '" + nombre + "' guardado en la memoria.");
+                Swal.fire('Guardado', `Cliente '${nombre}' guardado en la memoria.`, 'success');
             } else {
-                alert("Este cliente ya estaba registrado.");
+                Swal.fire('Aviso', 'Este cliente ya estaba registrado.', 'info');
             }
         }
 
@@ -800,59 +1098,343 @@
             guardarEnLocalStorage();
         }
 
-        function guardarYCompartirFactura() {
-            const categoria = document.getElementById('factura-categoria').value;
+        function processLogoUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const esPredeterminado = document.getElementById('marcar-predeterminado-logo').checked;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64String = e.target.result;
+                const nuevoLogo = {
+                    id: 'logo-' + Date.now(),
+                    nombre: file.name,
+                    base64: base64String,
+                    predeterminado: esPredeterminado
+                };
+                if (esPredeterminado) {
+                    db.logos.forEach(l => l.predeterminado = false);
+                    db.config.logoSeleccionado = nuevoLogo.id;
+                }
+                db.logos.push(nuevoLogo);
+                guardarEnLocalStorage();
+                renderSelectorLogos();
+                renderAjustes();
+                document.getElementById('marcar-predeterminado-logo').checked = false;
+                updatePreview();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function marcarLogoPredeterminado(id) {
+            db.logos.forEach(l => l.predeterminado = (l.id === id));
+            db.config.logoSeleccionado = id;
+            guardarEnLocalStorage();
+            renderSelectorLogos();
+            renderAjustes();
+            updatePreview();
+        }
+
+        function renderSelectorLogos() {
+            const sel = document.getElementById('factura-logo');
+            const currentSelection = sel.value || db.config.logoSeleccionado;
+            sel.innerHTML = '';
+            if (db.logos.length === 0) {
+                sel.innerHTML = '<option value="none">Sin logos (CONUCO texto)</option>';
+            } else {
+                db.logos.forEach(l => {
+                    const op = document.createElement('option');
+                    op.value = l.id;
+                    op.innerText = l.nombre + (l.predeterminado ? ' ★' : '');
+                    sel.appendChild(op);
+                });
+            }
+            if (db.logos.length > 0) {
+                const seleccionar = db.config.logoSeleccionado && db.logos.find(l => l.id === db.config.logoSeleccionado) ?
+                    db.config.logoSeleccionado :
+                    (db.logos.find(l => l.predeterminado) ? db.logos.find(l => l.predeterminado).id : db.logos[0].id);
+                sel.value = seleccionar;
+                db.config.logoSeleccionado = seleccionar;
+            } else {
+                db.config.logoSeleccionado = null;
+            }
+            guardarEnLocalStorage();
+        }
+
+        function eliminarLogo(id) {
+            Swal.fire({
+                title: '¿Eliminar logo?',
+                text: "Esta acción no se puede deshacer.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    db.logos = db.logos.filter(l => l.id !== id);
+                    if (db.config.logoSeleccionado === id) {
+                        db.config.logoSeleccionado = db.logos.length > 0 ? db.logos[0].id : null;
+                    }
+                    guardarEnLocalStorage();
+                    renderSelectorLogos();
+                    renderAjustes();
+                    updatePreview();
+                    Swal.fire('Eliminado', 'El logo ha sido eliminado.', 'success');
+                }
+            });
+        }
+
+        function renderSelectorCategorias() {
+            const sel = document.getElementById('factura-categoria');
+            const actual = sel.value;
+            sel.innerHTML = '';
+            db.categorias.forEach(cat => {
+                const op = document.createElement('option');
+                op.value = cat;
+                op.innerText = cat.charAt(0).toUpperCase() + cat.slice(1);
+                sel.appendChild(op);
+            });
+            if (db.categorias.includes(actual)) sel.value = actual;
+            else if (db.categorias.length > 0) sel.value = db.categorias[0];
+        }
+
+        function agregarCategoria() {
+            const input = document.getElementById('nueva-categoria-input');
+            const nombre = input.value.trim().toLowerCase();
+            if (!nombre) {
+                Swal.fire('Atención', 'Escribe un nombre de categoría.', 'warning');
+                return;
+            }
+            if (db.categorias.includes(nombre)) {
+                Swal.fire('Error', 'Esa categoría ya existe.', 'error');
+                return;
+            }
+            db.categorias.push(nombre);
+            guardarEnLocalStorage();
+            renderSelectorCategorias();
+            renderAjustes();
+            input.value = '';
+            updatePreview();
+        }
+
+        function eliminarCategoria(nombre) {
+            if (CATEGORIAS_PROTEGIDAS.includes(nombre)) {
+                Swal.fire('Acción denegada', `La categoría "${nombre}" es esencial para el sistema y no se puede eliminar.`, 'error');
+                return;
+            }
+            if (db.categorias.length <= 1) {
+                Swal.fire('Atención', 'Debe existir al menos una categoría.', 'warning');
+                return;
+            }
+            
+            Swal.fire({
+                title: `¿Eliminar la categoría "${nombre}"?`,
+                text: "Las facturas asociadas a esta categoría NO se borrarán.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    db.categorias = db.categorias.filter(c => c !== nombre);
+                    guardarEnLocalStorage();
+                    renderSelectorCategorias();
+                    renderAjustes();
+                    updatePreview();
+                    Swal.fire('Eliminada', 'La categoría ha sido eliminada.', 'success');
+                }
+            });
+        }
+
+        function renderSelectorMensajesGuardados() {
+            const sel = document.getElementById('select-mensajes-guardados');
+            sel.innerHTML = '<option value="">📋 Mensajes guardados...</option>';
+            db.mensajesPersonalizados.forEach((msg, idx) => {
+                const op = document.createElement('option');
+                op.value = idx;
+                const preview = msg.length > 40 ? msg.substring(0, 40) + '...' : msg;
+                op.innerText = preview;
+                sel.appendChild(op);
+            });
+        }
+
+        function cargarMensajeGuardado() {
+            const sel = document.getElementById('select-mensajes-guardados');
+            if (sel.value === '') return;
+            const idx = parseInt(sel.value);
+            if (db.mensajesPersonalizados[idx]) {
+                document.getElementById('factura-footer').value = db.mensajesPersonalizados[idx];
+                updatePreview();
+            }
+        }
+
+        function guardarMensajeSiEsNuevo(texto) {
+            if (!texto || texto.trim() === '') return;
+            const textoLimpio = texto.trim();
+            const esPredeterminado = Object.values(TEXTOS_PREDETERMINADOS).includes(textoLimpio);
+            if (esPredeterminado) return;
+            if (!db.mensajesPersonalizados.includes(textoLimpio)) {
+                db.mensajesPersonalizados.push(textoLimpio);
+                guardarEnLocalStorage();
+                renderSelectorMensajesGuardados();
+            }
+        }
+
+        function eliminarMensajePersonalizado(idx) {
+            Swal.fire({
+                title: '¿Eliminar mensaje?',
+                text: "¿Estás seguro de eliminar este mensaje personalizado guardado?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    db.mensajesPersonalizados.splice(idx, 1);
+                    guardarEnLocalStorage();
+                    renderSelectorMensajesGuardados();
+                    renderAjustes();
+                    Swal.fire('Eliminado', 'Mensaje eliminado.', 'success');
+                }
+            });
+        }
+
+        function abrirModalGuardar() {
+            document.getElementById('modal-guardar').classList.add('active');
+        }
+
+        function cerrarModalGuardar() {
+            document.getElementById('modal-guardar').classList.remove('active');
+        }
+
+        function confirmarGuardar(modo) {
+            cerrarModalGuardar();
+            const factura = guardarFactura();
+            if (!factura) return;
+            if (modo === 'compartir') {
+                compartirFacturaDesdeDatos(factura);
+            }
+        }
+
+        function guardarFactura() {
+            const categoriaSeleccionada = document.getElementById('factura-categoria').value;
             const cliente = document.getElementById('factura-cliente').value || "Cliente General";
             const fechaVal = document.getElementById('factura-fecha').value;
-            
-            let total = 0;
+            const footerText = document.getElementById('factura-footer').value;
+
+            let totalOriginal = 0;
             let conceptosArray = [];
             const conceptosInputs = document.querySelectorAll('.item-concepto');
             const montosInputs = document.querySelectorAll('.item-monto');
-
             conceptosInputs.forEach((input, index) => {
                 const cText = input.value || "Concepto";
                 const mVal = parseFloat(montosInputs[index].value) || 0;
-                total += mVal;
+                totalOriginal += mVal;
                 conceptosArray.push({ concepto: cText, monto: mVal });
             });
 
-            const nuevaFactura = {
-                id: 'fac-' + Date.now(),
-                categoria: categoria,
-                cliente: cliente,
-                fecha: fechaVal,
-                items: conceptosArray,
-                total: total
-            };
- 
-            db.facturas.unshift(nuevaFactura); 
-            guardarEnLocalStorage();
-
-            if (!db.clientes.includes(cliente) && cliente !== "Cliente General") {
-                db.clientes.push(cliente);
-                guardarEnLocalStorage();
-                actualizarDatalistClientes();
+            let abonosFinales = [...abonosPreviosFactura];
+            let totalAbonadoNuevo = 0;
+            if (categoriaSeleccionada === 'abono') {
+                const abonoFechas = document.querySelectorAll('.abono-fecha');
+                const abonoMontos = document.querySelectorAll('.abono-monto');
+                if (abonoFechas.length > 0) {
+                    const monto = parseFloat(abonoMontos[0].value) || 0;
+                    if (monto > 0) {
+                        abonosFinales.push({ fecha: abonoFechas[0].value, monto });
+                        totalAbonadoNuevo = monto;
+                    }
+                }
             }
 
-            const targetElement = document.getElementById('recibo-preview');
-            html2canvas(targetElement, {
-                scale: 2, 
-                useCORS: true,
-                backgroundColor: "#ffffff"
-            }).then(canvas => {
+            const totalAbonadoTotal = abonosFinales.reduce((sum, a) => sum + a.monto, 0);
+            const saldo = totalOriginal - totalAbonadoTotal;
+            let categoriaFinal = categoriaSeleccionada === 'abono' ? (saldo <= 0 ? 'cancelado' : 'pendiente') : categoriaSeleccionada;
+
+            if (facturaEditandoId) {
+                const fac = db.facturas.find(f => f.id === facturaEditandoId);
+                if (fac) {
+                    fac.categoria = categoriaFinal;
+                    fac.cliente = cliente;
+                    fac.fecha = fechaVal;
+                    fac.items = conceptosArray;
+                    fac.total = totalOriginal;
+                    fac.footer = footerText;
+                    fac.abonos = abonosFinales;
+                }
+                facturaEditandoId = null;
+            } else {
+                db.facturas.unshift({
+                    id: 'fac-' + Date.now(),
+                    categoria: categoriaFinal,
+                    cliente, fecha: fechaVal,
+                    items: conceptosArray,
+                    total: totalOriginal,
+                    footer: footerText,
+                    abonos: abonosFinales
+                });
+            }
+
+            abonosPreviosFactura = [];
+            guardarMensajeSiEsNuevo(footerText);
+            if (!db.clientes.includes(cliente) && cliente !== "Cliente General") {
+                db.clientes.push(cliente);
+                actualizarDatalistClientes();
+            }
+            guardarEnLocalStorage();
+            
+            Swal.fire({
+                title: '¡Guardado!',
+                text: 'Recibo guardado en el historial.',
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false
+            });
+            
+            return db.facturas.find(f => f.cliente === cliente && f.total === totalOriginal && f.fecha === fechaVal);
+        }
+
+        function compartirFacturaDesdeDatos(factura) {
+            const previewOriginal = document.getElementById('recibo-preview').cloneNode(true);
+            const containerOculto = document.createElement('div');
+            containerOculto.style.position = 'absolute';
+            containerOculto.style.left = '-9999px';
+            containerOculto.style.top = '0';
+            containerOculto.appendChild(previewOriginal);
+            document.body.appendChild(containerOculto);
+            
+            Swal.fire({
+                title: 'Procesando...',
+                text: 'Generando imagen del recibo',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            html2canvas(previewOriginal, { scale: 2, useCORS: true, backgroundColor: "#ffffff" }).then(canvas => {
+                document.body.removeChild(containerOculto);
                 canvas.toBlob(blob => {
-                    const file = new File([blob], `Recibo-${cliente.replace(/[^a-zA-Z0-9]/g, "_")}.png`, { type: 'image/png' });
+                    const file = new File([blob],
+                        `Recibo-${factura.cliente.replace(/[^a-zA-Z0-9]/g, "_")}.png`, { type: 'image/png' });
+                    
+                    Swal.close(); // Cerrar el loading
+
                     if (navigator.canShare && navigator.canShare({ files: [file] })) {
                         navigator.share({
                             files: [file],
                             title: 'Recibo Conuco',
-                            text: `Recibo de cuenta de ${cliente}`
+                            text: `Recibo de cuenta de ${factura.cliente}`
                         }).catch(err => {
-                            descargarImagenFallback(canvas, cliente);
+                            descargarImagenFallback(canvas, factura.cliente);
                         });
                     } else {
-                        descargarImagenFallback(canvas, cliente);
+                        descargarImagenFallback(canvas, factura.cliente);
                     }
                 }, 'image/png');
             });
@@ -863,60 +1445,46 @@
             lnk.download = `Recibo-${cliente.replace(/[^a-zA-Z0-9]/g, "_")}.png`;
             lnk.href = canvas.toDataURL('image/png');
             lnk.click();
-            alert("Recibo guardado en el historial. Se inició la descarga de la imagen en tu galería para mandarla por WhatsApp.");
+            Swal.fire('¡Listo!', 'Se inició la descarga de la imagen en tu galería para mandarla por WhatsApp.', 'success');
         }
 
-        function processLogoUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const base64String = e.target.result;
-                const nuevoLogo = { id: 'logo-' + Date.now(), nombre: file.name, base64: base64String };
-                db.logos.push(nuevoLogo);
-                guardarEnLocalStorage();
-                renderSelectorLogos();
-                renderAjustes();
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function renderSelectorLogos() {
-            const sel = document.getElementById('factura-logo');
-            const currentSelection = sel.value;
-            sel.innerHTML = '<option value="default">Logo Conuco Predeterminado</option>';
-            db.logos.forEach(l => {
-                const op = document.createElement('option');
-                op.value = l.id;
-                op.innerText = l.nombre;
-                sel.appendChild(op);
-            });
-            if([...sel.options].some(o => o.value === currentSelection)){
-                sel.value = currentSelection;
-            }
-        }
-
-        function eliminarLogo(id) {
-            if (confirm("¿Quieres eliminar este logo permanentemente?")) {
-                db.logos = db.logos.filter(l => l.id !== id);
-                guardarEnLocalStorage();
-                renderSelectorLogos();
-                renderAjustes();
-                updatePreview();
-            }
-        }
+        let categoriaActivaHistorial = 'todas';
 
         function renderHistorial() {
             const query = document.getElementById('search-historial').value.toLowerCase();
             const container = document.getElementById('historial-lista');
+            const tabsContainer = document.getElementById('historial-tabs');
+            tabsContainer.innerHTML = '';
+
+            const btnTodas = document.createElement('button');
+            btnTodas.className = 'tab-btn' + (categoriaActivaHistorial === 'todas' ? ' active' : '');
+            btnTodas.innerText = '📋 Todas';
+            btnTodas.onclick = () => { categoriaActivaHistorial = 'todas'; renderHistorial(); };
+            tabsContainer.appendChild(btnTodas);
+
+            db.categorias.forEach(cat => {
+                const btn = document.createElement('button');
+                btn.className = 'tab-btn' + (categoriaActivaHistorial === cat ? ' active' : '');
+                btn.innerText = cat.charAt(0).toUpperCase() + cat.slice(1);
+                btn.onclick = () => { categoriaActivaHistorial = cat; renderHistorial(); };
+                tabsContainer.appendChild(btn);
+            });
+
+            let filtradas = db.facturas.filter(f => {
+                const coincideBusqueda = f.cliente.toLowerCase().includes(query) ||
+                    f.items.some(i => i.concepto.toLowerCase().includes(query));
+                let coincideCategoria = true;
+                if (categoriaActivaHistorial === 'todas') {
+                    coincideCategoria = true;
+                } else if (categoriaActivaHistorial === 'abono') {
+                    coincideCategoria = (f.abonos && f.abonos.length > 0 && f.categoria !== 'cancelado');
+                } else {
+                    coincideCategoria = (f.categoria === categoriaActivaHistorial);
+                }
+                return coincideBusqueda && coincideCategoria;
+            });
+
             container.innerHTML = "";
-
-            const filtradas = db.facturas.filter(f => 
-                f.cliente.toLowerCase().includes(query) || 
-                f.items.some(i => i.concepto.toLowerCase().includes(query))
-            );
-
             if (filtradas.length === 0) {
                 container.innerHTML = "<p style='text-align:center;color:#666;padding:20px;'>No se encontraron recibos guardados.</p>";
                 return;
@@ -928,21 +1496,41 @@
                 let resumenConceptos = f.items.map(i => i.concepto).join(', ');
                 if (resumenConceptos.length > 50) resumenConceptos = resumenConceptos.substring(0, 50) + "...";
 
+                let infoAbonos = '';
+                if (f.abonos && f.abonos.length > 0) {
+                    if (categoriaActivaHistorial === 'abono') {
+                        infoAbonos = '<div style="font-size:13px; color:#555; margin-top:4px;"><strong>Historial de abonos:</strong></div>';
+                        f.abonos.forEach(ab => {
+                            infoAbonos += `<div style="font-size:12px; color:#555;">- ${formatearFecha(ab.fecha)}: COP$ ${formatearMoneda(ab.monto)}</div>`;
+                        });
+                    } else {
+                        const ultimoAbono = f.abonos[f.abonos.length - 1];
+                        infoAbonos = `<div style="font-size:13px; color:#555;">Último abono: COP$ ${formatearMoneda(ultimoAbono.monto)} el ${formatearFecha(ultimoAbono.fecha)}</div>`;
+                    }
+                    const totalAbonado = f.abonos.reduce((sum, a) => sum + a.monto, 0);
+                    const saldo = f.total - totalAbonado;
+                    infoAbonos += saldo > 0
+                        ? `<div style="font-size:13px; color:#555;">Debe: COP$ ${formatearMoneda(saldo)}</div>`
+                        : `<div style="font-size:13px; color:#2e7d32;">Cuenta cancelada con éxito</div>`;
+                }
+
                 itemDiv.innerHTML = `
-                    <div class="history-meta">
-                        <span>📅 ${f.fecha ? f.fecha.replace('T', ' ') : 'S/F'}</span>
-                        <span class="badge bg-${f.categoria}">${f.categoria}</span>
-                    </div>
-                    <div class="history-title">${f.cliente}</div>
-                    <div style="font-size: 14px; color:#555; margin-bottom:8px;">${resumenConceptos}</div>
-                    <div style="display:flex; justify-content:space-between; align-items:center;">
-                        <strong style="color:#000; font-size:16px;">COP$ ${formatearMoneda(f.total)}</strong>
-                        <div>
-                            <button class="btn btn-secondary btn-sm" style="width:auto; padding:5px 10px;" onclick="cargarFacturaParaEditar('${f.id}')">🔄 Cargar</button>
-                            <button class="btn btn-danger btn-sm" style="width:auto; padding:5px 10px;" onclick="eliminarFacturaHistorial('${f.id}')">🗑️</button>
-                        </div>
-                    </div>
-                `;
+              <div class="history-meta">
+                <span>📅 ${f.fecha ? f.fecha.replace('T', ' ') : 'S/F'}</span>
+                <span class="badge bg-${f.categoria}">${f.categoria}</span>
+              </div>
+              <div class="history-title">${f.cliente}</div>
+              <div style="font-size: 14px; color:#555; margin-bottom:4px;">${resumenConceptos}</div>
+              ${infoAbonos}
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px;">
+                <strong style="color:#000; font-size:16px;">COP$ ${formatearMoneda(f.total)}</strong>
+                <div style="display:flex; gap:4px;">
+                  <button class="btn btn-secondary btn-sm" style="width:auto; padding:5px 8px;" onclick="cargarFacturaParaEditar('${f.id}')">🔄</button>
+                  <button class="btn btn-success btn-sm" style="width:auto; padding:5px 8px;" onclick="compartirFacturaGuardada('${f.id}')">📤</button>
+                  <button class="btn btn-danger btn-sm" style="width:auto; padding:5px 8px;" onclick="eliminarFacturaHistorial('${f.id}')">🗑️</button>
+                </div>
+              </div>
+            `;
                 container.appendChild(itemDiv);
             });
         }
@@ -950,24 +1538,83 @@
         function cargarFacturaParaEditar(id) {
             const fac = db.facturas.find(f => f.id === id);
             if (!fac) return;
+            facturaEditandoId = fac.id;
+            abonosPreviosFactura = fac.abonos || [];
             document.getElementById('factura-categoria').value = fac.categoria;
             document.getElementById('factura-cliente').value = fac.cliente;
             document.getElementById('factura-fecha').value = fac.fecha;
+            document.getElementById('factura-footer').value = fac.footer || '';
 
-            const container = document.getElementById('items-container');
-            container.innerHTML = "";
+            document.getElementById('items-container').innerHTML = "";
             fac.items.forEach(i => addItemRow(i.concepto, i.monto));
 
+            document.getElementById('abonos-container').innerHTML = "";
+            toggleAbonosSection();
+
+            if (fac.logo && db.logos.find(l => l.id === fac.logo)) {
+                document.getElementById('factura-logo').value = fac.logo;
+            }
             switchTab('nueva-factura');
             updatePreview();
         }
 
+        function compartirFacturaGuardada(id) {
+            const fac = db.facturas.find(f => f.id === id);
+            if (!fac) return;
+            const categoriaOriginal = document.getElementById('factura-categoria').value;
+            const clienteOriginal = document.getElementById('factura-cliente').value;
+            const fechaOriginal = document.getElementById('factura-fecha').value;
+            const footerOriginal = document.getElementById('factura-footer').value;
+            const itemsContainerOriginal = document.getElementById('items-container').innerHTML;
+            const abonosContainerOriginal = document.getElementById('abonos-container').innerHTML;
+            const abonosSectionDisplay = document.getElementById('abonos-section').style.display;
+            const previos = [...abonosPreviosFactura];
+
+            abonosPreviosFactura = fac.abonos || [];
+            document.getElementById('factura-categoria').value = fac.categoria;
+            document.getElementById('factura-cliente').value = fac.cliente;
+            document.getElementById('factura-fecha').value = fac.fecha;
+            document.getElementById('factura-footer').value = fac.footer || '';
+            document.getElementById('items-container').innerHTML = "";
+            fac.items.forEach(i => addItemRow(i.concepto, i.monto));
+            document.getElementById('abonos-container').innerHTML = "";
+            toggleAbonosSection();
+            updatePreview();
+
+            setTimeout(() => {
+                compartirFacturaDesdeDatos(fac);
+                setTimeout(() => {
+                    abonosPreviosFactura = previos;
+                    document.getElementById('factura-categoria').value = categoriaOriginal;
+                    document.getElementById('factura-cliente').value = clienteOriginal;
+                    document.getElementById('factura-fecha').value = fechaOriginal;
+                    document.getElementById('factura-footer').value = footerOriginal;
+                    document.getElementById('items-container').innerHTML = itemsContainerOriginal;
+                    document.getElementById('abonos-container').innerHTML = abonosContainerOriginal;
+                    document.getElementById('abonos-section').style.display = abonosSectionDisplay;
+                    updatePreview();
+                }, 300);
+            }, 300);
+        }
+
         function eliminarFacturaHistorial(id) {
-            if (confirm("¿Seguro que quieres eliminar este recibo del historial?")) {
-                db.facturas = db.facturas.filter(f => f.id !== id);
-                guardarEnLocalStorage();
-                renderHistorial();
-            }
+            Swal.fire({
+                title: '¿Eliminar recibo?',
+                text: "¿Seguro que quieres eliminar este recibo del historial de forma permanente?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    db.facturas = db.facturas.filter(f => f.id !== id);
+                    guardarEnLocalStorage();
+                    renderHistorial();
+                    Swal.fire('Eliminado', 'El recibo ha sido borrado.', 'success');
+                }
+            });
         }
 
         function renderAjustes() {
@@ -976,7 +1623,7 @@
             db.clientes.forEach(c => {
                 const tag = document.createElement('span');
                 tag.className = 'client-tag';
-                tag.innerHTML = `${c} <remove onclick="eliminarCliente('${c}')">×</remove>`;
+                tag.innerHTML = `${c} <remove onclick="eliminarCliente('${c.replace(/'/g, "\\'")}')">×</remove>`;
                 clientContainer.appendChild(tag);
             });
 
@@ -989,11 +1636,38 @@
                     const d = document.createElement('div');
                     d.style = "display:flex; align-items:center; justify-content:between; margin: 6px 0; background:#f0f0f0; padding:5px; border-radius:4px;";
                     d.innerHTML = `
-                        <img src="${l.base64}" style="height:35px; width:60px; object-fit:contain; background:white; margin-right:10px;">
-                        <span style="flex:1; font-size:13px; overflow:hidden; text-overflow:ellipsis;">${l.nombre}</span>
-                        <button class="btn btn-danger btn-sm" style="width:auto; padding:2px 6px;" onclick="eliminarLogo('${l.id}')">Borrar</button>
-                    `;
+                <img src="${l.base64}" style="height:35px; width:60px; object-fit:contain; background:white; margin-right:10px;">
+                <span style="flex:1; font-size:13px; overflow:hidden; text-overflow:ellipsis;">${l.nombre} ${l.predeterminado ? '⭐' : ''}</span>
+                <button class="btn btn-success btn-sm" style="width:auto; padding:2px 6px; margin-right:4px;" onclick="marcarLogoPredeterminado('${l.id}')">★</button>
+                <button class="btn btn-danger btn-sm" style="width:auto; padding:2px 6px;" onclick="eliminarLogo('${l.id}')">Borrar</button>
+              `;
                     logosContainer.appendChild(d);
+                });
+            }
+
+            const catContainer = document.getElementById('lista-categorias-tags');
+            catContainer.innerHTML = "";
+            db.categorias.forEach(cat => {
+                const tag = document.createElement('span');
+                tag.className = 'client-tag';
+                const esProtegida = CATEGORIAS_PROTEGIDAS.includes(cat);
+                tag.innerHTML = `${cat} ${esProtegida ? '🔒' : ''} <remove onclick="eliminarCategoria('${cat.replace(/'/g, "\\'")}')">×</remove>`;
+                catContainer.appendChild(tag);
+            });
+
+            const msgContainer = document.getElementById('lista-mensajes-personalizados');
+            msgContainer.innerHTML = "";
+            if (db.mensajesPersonalizados.length === 0) {
+                msgContainer.innerHTML = "<p style='font-size:13px; color:#888;'>No hay mensajes finales personalizados guardados.</p>";
+            } else {
+                db.mensajesPersonalizados.forEach((msg, idx) => {
+                    const d = document.createElement('div');
+                    d.style = "display:flex; align-items:center; justify-content:space-between; margin: 6px 0; background:#f9f9f9; padding:8px; border-radius:4px;";
+                    d.innerHTML = `
+                <span style="flex:1; font-size:13px; white-space:pre-line;">${msg}</span>
+                <button class="btn btn-danger btn-sm" style="width:auto; padding:2px 6px;" onclick="eliminarMensajePersonalizado(${idx})">🗑️</button>
+              `;
+                    msgContainer.appendChild(d);
                 });
             }
         }
@@ -1022,36 +1696,47 @@
                     const jsonCargado = JSON.parse(e.target.result);
                     if (jsonCargado.clientes && jsonCargado.facturas) {
                         db = jsonCargado;
+                        migrarDB();
                         guardarEnLocalStorage();
                         actualizarDatalistClientes();
                         renderSelectorLogos();
-                        
-                        // Restaurar configuraciones visuales tras importar
-                        if(db.config) {
-                            if(db.config.logoSize) {
+                        renderSelectorCategorias();
+                        renderSelectorMensajesGuardados();
+                        if (db.config) {
+                            if (db.config.logoSize) {
                                 document.getElementById('factura-logo-size').value = db.config.logoSize;
                                 document.getElementById('logo-size-display').innerText = db.config.logoSize + 'px';
                             }
-                            if(db.config.receiptWidth) document.getElementById('factura-ancho').value = db.config.receiptWidth;
+                            if (db.config.receiptWidth) document.getElementById('factura-ancho').value = db.config.receiptWidth;
                         }
-                        
                         updatePreview();
-                        alert("¡Respaldo importado y restaurado con éxito, hermano! Todo está en su sitio.");
+                        Swal.fire('¡Éxito!', '¡Respaldo importado y restaurado con éxito! Todo está en su sitio.', 'success');
                     } else {
-                        alert("El archivo no parece ser un respaldo válido del sistema.");
+                        Swal.fire('Error', 'El archivo no parece ser un respaldo válido del sistema.', 'error');
                     }
                 } catch (err) {
-                    alert("Error leyendo el archivo JSON.");
+                    Swal.fire('Error', 'Error leyendo el archivo JSON.', 'error');
                 }
             };
             reader.readAsText(file);
         }
 
         function limpiarTodoElSistema() {
-            if (confirm("⚠️ ¿Estás COMPLETAMENTE seguro de vaciar la app? Perderás clientes, logos e historial.")) {
-                localStorage.clear();
-                location.reload();
-            }
+            Swal.fire({
+                title: '⚠️ ADVERTENCIA CRÍTICA',
+                text: "¿Estás COMPLETAMENTE seguro de vaciar la app? Perderás todos tus clientes, logos, e historial de facturas. Esta acción es destructiva.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sí, borrar TODO',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    localStorage.clear();
+                    location.reload();
+                }
+            });
         }
 
         function guardarEnLocalStorage() {
@@ -1063,52 +1748,43 @@
             if (localData) {
                 try {
                     db = JSON.parse(localData);
-                    // Cargar preferencias visuales guardadas
-                    if(db.config) {
-                        if(db.config.logoSize) {
+                    migrarDB();
+                    if (db.config) {
+                        if (db.config.logoSize) {
                             document.getElementById('factura-logo-size').value = db.config.logoSize;
                             document.getElementById('logo-size-display').innerText = db.config.logoSize + 'px';
                         }
-                        if(db.config.receiptWidth) document.getElementById('factura-ancho').value = db.config.receiptWidth;
+                        if (db.config.receiptWidth) document.getElementById('factura-ancho').value = db.config.receiptWidth;
                     }
-                } catch(e) {
+                } catch (e) {
                     console.error("Error al parsear datos de localStorage");
                 }
             }
             actualizarDatalistClientes();
             renderSelectorLogos();
+            renderSelectorCategorias();
+            renderSelectorMensajesGuardados();
         }
     </script>
     <script>
-        // LÓGICA DE INSTALACIÓN PWA
         let eventoInstalacion;
-        
         window.addEventListener('beforeinstallprompt', (e) => {
-            // Previene que Chrome muestre el aviso nativo miniatura
             e.preventDefault();
-            // Guarda el evento para dispararlo cuando el usuario toque el botón
             eventoInstalacion = e;
-            // Muestra nuestro banner azul personalizado
             document.getElementById('install-banner').style.display = 'block';
         });
 
         function instalarApp() {
             if (eventoInstalacion) {
-                // Muestra el prompt nativo grande de instalación
                 eventoInstalacion.prompt();
-                
-                // Espera a ver qué elige el usuario (Instalar o Cancelar)
                 eventoInstalacion.userChoice.then((choiceResult) => {
                     if (choiceResult.outcome === 'accepted') {
-                        // Si acepta, ocultamos el botón
                         document.getElementById('install-banner').style.display = 'none';
                     }
                     eventoInstalacion = null;
                 });
             }
         }
-
-        // Registrar el Service Worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js')
