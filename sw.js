@@ -1,4 +1,4 @@
-const CACHE_NAME = 'conuco-pwa-v10';
+const CACHE_NAME = 'conuco-pwa-v11';
 const urlsToCache = [
   './',
   './index.html',
@@ -17,8 +17,7 @@ self.addEventListener('install', event => {
         return cache.addAll(urlsToCache);
       })
   );
-  // Forzar la activación inmediata del nuevo SW
-  self.skipWaiting();
+  // Eliminada la línea self.skipWaiting() para que la actualización espere al usuario
 });
 
 // Interceptar peticiones y servir desde caché si no hay red
@@ -26,7 +25,6 @@ self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request)
       .then(response => {
-        // Si está en el caché, devuélvelo. Si no, búscalo en la red.
         return response || fetch(event.request);
       })
   );
